@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Hangom</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Cpath d='M16 7a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0v-5a4 4 0 0 0-4-4z' fill='white'/%3E%3Cpath d='M22 14v2a6 6 0 0 1-12 0v-2' stroke='white' stroke-width='2' stroke-linecap='round' fill='none'/%3E%3Cline x1='16' y1='22' x2='16' y2='25' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='13' y1='25' x2='19' y2='25' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface2: #e4eaf2;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --accent2: #059669;
+    --accent2-light: #d1fae5;
+    --accent3: #d97706;
+    --accent3-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --text: #0f172a;
+    --text2: #64748b;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --radius: 20px;
+    --radius-sm: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; font-family: 'Nunito Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+  .app { display: flex; flex-direction: column; height: 100vh; }
+
+  /* HEADER */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 12px; background: var(--surface);
+    box-shadow: var(--shadow); flex-shrink: 0; z-index: 10;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .header-logo {
+    width: 38px; height: 38px; background: var(--accent);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 20px;
+  }
+  .header h1 { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; color: var(--text); }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .header-status {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: var(--text2);
+    background: var(--surface2); padding: 6px 12px; border-radius: 30px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; transition: all 0.3s; flex-shrink: 0; }
+  .dot.ok { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+  .dot.err { background: var(--danger); }
+  .settings-btn {
+    background: var(--surface2); border: none; color: var(--text2);
+    width: 42px; height: 42px; border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; transition: all 0.15s;
+  }
+  .settings-btn:active { background: var(--accent); color: #fff; transform: scale(0.93); }
+
+  /* BODY WRAP */
+  .body-wrap { display: flex; flex: 1; overflow: hidden; flex-direction: column; }
+
+  /* CONTENT */
+  .content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+  /* PAGES */
+  .page { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+  .page.active { display: flex; }
+
+  /* TABS - bottom on mobile */
+  .tabs {
+    display: flex; background: var(--surface);
+    padding: 8px 12px 12px; gap: 8px; flex-shrink: 0;
+    border-top: 1px solid var(--surface2);
+  }
+  .tab {
+    flex: 1; padding: 10px 4px; border: none; border-radius: var(--radius-sm);
+    background: transparent; color: var(--text2);
+    font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .tab i { font-size: 24px; }
+  .tab.active { background: var(--accent-light); color: var(--accent); }
+  .tab:active { transform: scale(0.95); }
+
+  /* TABLET / DESKTOP */
+  @media (min-width: 768px) {
+    .header { padding: 16px 28px; }
+    .header h1 { font-size: 26px; }
+    .body-wrap { flex-direction: row; }
+    .tabs {
+      flex-direction: column; width: 210px; padding: 20px 14px;
+      gap: 6px; border-top: none; border-right: 1px solid var(--surface2);
+      align-items: stretch; order: -1;
+    }
+    .tab {
+      flex-direction: row; justify-content: flex-start;
+      padding: 14px 16px; font-size: 15px; gap: 12px; flex: none;
+    }
+    .tab i { font-size: 22px; }
+    .quick-scroll { grid-template-columns: 1fr 1fr 1fr !important; }
+    .btn-speak { font-size: 22px !important; padding: 22px !important; }
+    .btn-icon { width: 66px !important; height: 66px !important; font-size: 26px !important; }
+    #typed-input { font-size: 26px !important; }
+    .quick-btn { font-size: 17px !important; min-height: 84px !important; }
+    .saved-item-text { font-size: 18px !important; }
+    .si-btn { width: 52px !important; height: 52px !important; font-size: 22px !important; }
+  }
+
+  @media (min-width: 1200px) {
+    .quick-scroll { grid-template-columns: repeat(4, 1fr) !important; }
+    #typed-input { font-size: 28px !important; }
+    .output-box { min-height: 110px !important; }
+  }
+
+  /* ─── PAGE 1 ─── */
+  .output-box {
+    margin: 14px 14px 8px; background: var(--surface);
+    border-radius: var(--radius); border: 2.5px solid var(--surface2);
+    padding: 14px 16px; flex-shrink: 0; box-shadow: var(--shadow);
+    transition: border-color 0.2s; min-height: 90px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .output-box:focus-within { border-color: var(--accent); }
+  #typed-input {
+    background: transparent; border: none; outline: none;
+    color: var(--text); font-size: 22px;
+    font-family: 'Nunito', sans-serif; font-weight: 700;
+    width: 100%; resize: none; min-height: 52px; line-height: 1.4;
+  }
+  #typed-input::placeholder { color: #b0bec5; font-weight: 600; }
+  .output-counter { font-size: 11px; color: var(--text2); font-weight: 700; text-align: right; margin-top: 6px; }
+
+  .action-row { display: flex; gap: 10px; margin: 0 14px 10px; flex-shrink: 0; }
+  .btn-speak {
+    flex: 1; padding: 18px; border: none; border-radius: var(--radius);
+    background: var(--accent); color: #fff;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 18px;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .btn-speak i { font-size: 24px; }
+  .btn-speak:active { transform: scale(0.97); }
+  .btn-speak.playing { background: var(--accent2); box-shadow: 0 4px 20px rgba(5,150,105,0.35); animation: pulse 1.2s infinite; }
+  .btn-speak.loading { background: #93c5fd; box-shadow: none; pointer-events: none; }
+  .btn-icon {
+    width: 58px; height: 58px; border: none; border-radius: var(--radius);
+    background: var(--surface2); color: var(--text2); font-size: 24px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .btn-icon:active { transform: scale(0.93); }
+  .btn-icon.danger:active { background: var(--danger-light); color: var(--danger); }
+  .btn-icon.success:active { background: var(--accent2-light); color: var(--accent2); }
+
+  .section-label {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--text2); padding: 4px 14px 8px; flex-shrink: 0;
+  }
+  .quick-scroll {
+    flex: 1; overflow-y: auto; padding: 0 12px 12px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start;
+  }
+  .quick-btn {
+    background: var(--surface); border: 2px solid var(--surface2);
+    border-radius: var(--radius); color: var(--text);
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px;
+    padding: 18px 12px; cursor: pointer; text-align: center;
+    transition: all 0.15s; line-height: 1.3; min-height: 72px;
+    display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);
+  }
+  .quick-btn:active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); transform: scale(0.96); }
+
+  /* ─── PAGE 2 ─── */
+  .saved-top { padding: 14px 14px 8px; flex-shrink: 0; }
+  .search-box {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); padding: 12px 14px; box-shadow: var(--shadow);
+  }
+  .search-box i { color: var(--text2); font-size: 20px; flex-shrink: 0; }
+  .search-box input {
+    background: transparent; border: none; outline: none;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 16px;
+    color: var(--text); width: 100%;
+  }
+  .search-box input::placeholder { color: #b0bec5; }
+  .saved-list {
+    flex: 1; overflow-y: auto; padding: 0 14px 8px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .saved-item {
+    background: var(--surface); border: 2px solid var(--surface2);
+    border-radius: var(--radius); padding: 14px 12px;
+    display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow);
+  }
+  .saved-item-text {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 16px; color: var(--text); line-height: 1.3;
+  }
+  .si-btn {
+    width: 46px; height: 46px; border-radius: 13px; border: none;
+    font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .si-play { background: var(--accent); color: #fff; }
+  .si-play:active { transform: scale(0.9); }
+  .si-edit { background: var(--surface2); color: var(--text2); }
+  .si-edit:active { background: var(--accent3-light); color: var(--accent3); transform: scale(0.9); }
+  .si-del { background: var(--surface2); color: var(--text2); }
+  .si-del:active { background: var(--danger-light); color: var(--danger); transform: scale(0.9); }
+  .add-saved-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin: 0 14px 14px; padding: 15px;
+    border: 2.5px dashed #cbd5e1; border-radius: var(--radius);
+    background: transparent; color: var(--text2);
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px;
+    cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  }
+  .add-saved-btn i { font-size: 20px; }
+  .add-saved-btn:active { border-color: var(--accent2); color: var(--accent2); background: var(--accent2-light); }
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; padding: 50px 20px; color: var(--text2);
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; text-align: center;
+  }
+  .empty-state i { font-size: 52px; color: #cbd5e1; }
+
+  /* ─── PAGE 3 ─── */
+  .gen-top { margin: 14px 14px 10px; flex-shrink: 0; }
+  .gen-hint {
+    font-size: 13px; color: var(--text2); font-weight: 600;
+    margin-bottom: 10px; line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 8px;
+    background: var(--accent3-light); border-radius: var(--radius-sm); padding: 10px 14px;
+  }
+  .gen-hint i { font-size: 18px; flex-shrink: 0; margin-top: 1px; color: var(--accent3); }
+  .gen-input {
+    width: 100%; background: var(--surface);
+    border: 2px solid var(--surface2); border-radius: var(--radius-sm);
+    color: var(--text); font-family: 'Nunito', sans-serif;
+    font-size: 17px; font-weight: 700; padding: 14px 16px;
+    outline: none; transition: border-color 0.2s; box-shadow: var(--shadow); display: block;
+  }
+  .gen-input:focus { border-color: var(--accent); }
+  .gen-input::placeholder { color: #b0bec5; font-weight: 600; }
+  .gen-btn {
+    width: 100%; margin-top: 10px; padding: 16px; border: none;
+    border-radius: var(--radius-sm); background: var(--accent3); color: #fff;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 17px;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(217,119,6,0.3);
+  }
+  .gen-btn i { font-size: 22px; }
+  .gen-btn:active { transform: scale(0.97); }
+  .gen-btn:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; pointer-events: none; }
+  .gen-list {
+    flex: 1; overflow-y: auto; padding: 0 14px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .gen-item {
+    background: var(--surface); border: 2px solid var(--surface2);
+    border-radius: var(--radius); padding: 14px 12px;
+    display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow);
+  }
+  .gen-item-text {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 15px; color: var(--text); line-height: 1.4;
+  }
+  .gi-btn {
+    width: 44px; height: 44px; border-radius: 12px; border: none; font-size: 20px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .gi-play { background: var(--accent); color: #fff; }
+  .gi-play:active { transform: scale(0.9); }
+  .gi-save { background: var(--surface2); color: var(--accent2); }
+  .gi-save:active { background: var(--accent2-light); transform: scale(0.9); }
+
+  /* ─── MODALS ─── */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,23,42,0.55); z-index: 100;
+    align-items: flex-end; justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-bg.open { display: flex; }
+  @media (min-width: 768px) {
+    .modal-bg { align-items: center; }
+    .modal, .add-modal { border-radius: 24px !important; max-width: 520px; }
+  }
+  .modal {
+    background: var(--surface); border-radius: 28px 28px 0 0;
+    padding: 28px 20px 40px; width: 100%; max-width: 520px;
+    animation: slideUp 0.25s cubic-bezier(0.32,0.72,0,1);
+    max-height: 92vh; overflow-y: auto;
+  }
+  @keyframes slideUp { from { transform: translateY(30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+  .modal-handle { width: 40px; height: 5px; border-radius: 3px; background: var(--surface2); margin: 0 auto 20px; }
+  .modal h2 {
+    font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900;
+    margin-bottom: 6px; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .modal h2 i { color: var(--accent); font-size: 24px; }
+  .modal-desc { font-size: 13px; color: var(--text2); font-weight: 600; margin-bottom: 22px; line-height: 1.6; }
+  .modal-desc a { color: var(--accent); }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 7px;
+  }
+  .field input {
+    width: 100%; background: var(--bg); border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+    padding: 13px 14px; outline: none; transition: border-color 0.2s;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .field input::placeholder { color: #b0bec5; font-weight: 600; }
+  .save-settings {
+    width: 100%; padding: 16px; border: none;
+    border-radius: var(--radius-sm); background: var(--accent); color: #fff;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 17px;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.3); margin-top: 6px;
+  }
+  .save-settings:active { transform: scale(0.97); }
+  .add-modal {
+    background: var(--surface); border-radius: 28px 28px 0 0;
+    padding: 28px 20px 40px; width: 100%; max-width: 520px;
+    animation: slideUp 0.25s cubic-bezier(0.32,0.72,0,1);
+  }
+  .add-modal h2 {
+    font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900;
+    margin-bottom: 16px; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .add-modal h2 i { color: var(--accent2); }
+  .add-textarea {
+    width: 100%; background: var(--bg); border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 700;
+    padding: 14px; outline: none; resize: none; min-height: 90px; line-height: 1.4;
+    transition: border-color 0.2s; margin-bottom: 12px; display: block;
+  }
+  .add-textarea:focus { border-color: var(--accent); }
+  .add-confirm {
+    width: 100%; padding: 16px; border: none;
+    border-radius: var(--radius-sm); background: var(--accent2); color: #fff;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 17px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(5,150,105,0.3); transition: all 0.15s;
+  }
+  .add-confirm:active { transform: scale(0.97); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 86px; left: 50%; transform: translateX(-50%) translateY(10px);
+    background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 30px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+    z-index: 200; opacity: 0; transition: all 0.3s; pointer-events: none;
+    white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast i { font-size: 18px; }
+  .toast.success { background: var(--accent2); }
+  .toast.error { background: var(--danger); }
+  @media (min-width: 768px) { .toast { bottom: 32px; } }
+
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 4px 20px rgba(5,150,105,0.35); }
+    50% { box-shadow: 0 4px 36px rgba(5,150,105,0.7); }
+  }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin { display: inline-block; animation: spin 0.8s linear infinite; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+  /* ─── PAGE 3 – KÉZÍRÁS ─── */
+  .hw-page { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 12px 14px 8px; gap: 10px; }
+  .hw-hint {
+    font-size: 13px; color: var(--text2); font-weight: 600; line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 8px;
+    background: #ede9fe; border-radius: var(--radius-sm); padding: 10px 14px; flex-shrink: 0;
+  }
+  .hw-hint i { font-size: 18px; flex-shrink: 0; margin-top: 1px; color: #7c3aed; }
+  .hw-canvas-wrap {
+    flex: 1; background: var(--surface); border-radius: var(--radius);
+    border: 2.5px solid var(--surface2); box-shadow: var(--shadow);
+    position: relative; overflow: hidden; touch-action: none; min-height: 180px;
+  }
+  .hw-canvas-wrap canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+  .hw-canvas-placeholder {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    color: #cbd5e1; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 16px;
+    pointer-events: none;
+  }
+  .hw-canvas-placeholder i { font-size: 52px; }
+  .hw-toolbar { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+  .hw-color-row { display: flex; gap: 6px; align-items: center; }
+  .hw-color {
+    width: 30px; height: 30px; border-radius: 50%; border: 3px solid transparent;
+    cursor: pointer; transition: transform 0.15s; flex-shrink: 0;
+  }
+  .hw-color.active { border-color: var(--accent); transform: scale(1.18); }
+  .hw-size-row { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+  .hw-size-btn {
+    background: var(--surface2); border: none; border-radius: 10px; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px;
+    color: var(--text2); padding: 6px 10px; transition: all 0.15s;
+  }
+  .hw-size-btn.active { background: var(--accent); color: #fff; }
+  .hw-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .hw-btn {
+    flex: 1; padding: 14px; border: none; border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .hw-btn i { font-size: 20px; }
+  .hw-btn:active { transform: scale(0.97); }
+  .hw-btn-clear { background: var(--surface2); color: var(--text2); }
+  .hw-btn-clear:active { background: var(--danger-light); color: var(--danger); }
+  .hw-btn-recog { background: #7c3aed; color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,0.3); }
+  .hw-btn-recog:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; pointer-events: none; }
+  .hw-result {
+    background: var(--surface); border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); padding: 12px 14px; flex-shrink: 0;
+    display: none; gap: 10px; align-items: center; box-shadow: var(--shadow);
+  }
+  .hw-result.visible { display: flex; }
+  .hw-result-text {
+    flex: 1; font-family: 'Nunito', sans-serif; font-weight: 700;
+    font-size: 17px; color: var(--text); line-height: 1.4;
+  }
+  .hw-result-btn {
+    width: 44px; height: 44px; border-radius: 12px; border: none; font-size: 20px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .hw-result-btn:active { transform: scale(0.9); }
+  .hw-rb-speak { background: var(--accent); color: #fff; }
+  .hw-rb-send { background: var(--accent2-light); color: var(--accent2); }
+  .hw-rb-save { background: var(--surface2); color: var(--text2); }
+
+  /* ─── GYORS MONDATOK SZERKESZTŐ ─── */
+  .section-label-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 14px 8px; flex-shrink: 0;
+  }
+  .section-label-row .section-label { padding: 0; }
+  .edit-quick-btn {
+    background: var(--surface2); border: none; border-radius: 10px;
+    color: var(--text2); font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: 12px; padding: 6px 12px; cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .edit-quick-btn i { font-size: 14px; }
+  .edit-quick-btn.active { background: var(--accent); color: #fff; }
+  .edit-quick-btn:active { transform: scale(0.95); }
+
+  /* quick-btn szerkesztő módban */
+  .quick-btn.edit-mode { position: relative; border-color: #fbbf24; background: #fffbeb; }
+  .quick-btn.edit-mode::after {
+    content: '✎'; position: absolute; top: 4px; right: 6px;
+    font-size: 14px; color: #d97706; opacity: 0.7;
+  }
+
+  /* Gyors mondat szerkesztő modal */
+  .qedit-modal {
+    background: var(--surface); border-radius: 28px 28px 0 0;
+    padding: 28px 20px 40px; width: 100%; max-width: 520px;
+    animation: slideUp 0.25s cubic-bezier(0.32,0.72,0,1);
+  }
+  .qedit-modal h2 {
+    font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900;
+    margin-bottom: 16px; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .qedit-modal h2 i { color: var(--accent3); }
+  .qedit-input {
+    width: 100%; background: var(--bg); border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 700;
+    padding: 14px; outline: none; transition: border-color 0.2s; margin-bottom: 12px; display: block;
+  }
+  .qedit-input:focus { border-color: var(--accent3); }
+  .qedit-actions { display: flex; gap: 10px; }
+  .qedit-save {
+    flex: 1; padding: 15px; border: none; border-radius: var(--radius-sm);
+    background: var(--accent3); color: #fff;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(217,119,6,0.3); transition: all 0.15s;
+  }
+  .qedit-save:active { transform: scale(0.97); }
+  .qedit-del {
+    width: 54px; padding: 15px; border: none; border-radius: var(--radius-sm);
+    background: var(--danger-light); color: var(--danger);
+    font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .qedit-del:active { transform: scale(0.97); background: var(--danger); color: #fff; }
+  /* ─── PAGE 4 – PÁRBESZÉD ─── */
+  .pb-page { display: flex; flex-direction: column; flex: 1; overflow-y: auto; padding: 12px 14px 16px; gap: 12px; }
+  .pb-hint {
+    font-size: 13px; color: var(--text2); font-weight: 600; line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 8px;
+    background: var(--accent-light); border-radius: var(--radius-sm); padding: 10px 14px; flex-shrink: 0;
+  }
+  .pb-mic-area { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+  .pb-mic-btn {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    width: 100%; padding: 18px; border: none; border-radius: var(--radius);
+    background: var(--accent); color: #fff;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 18px;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+  }
+  .pb-mic-btn:active { transform: scale(0.97); }
+  .pb-mic-btn.recording {
+    background: var(--danger); box-shadow: 0 4px 20px rgba(220,38,38,0.4);
+    animation: pulse-red 1.2s infinite;
+  }
+  @keyframes pulse-red {
+    0%,100% { box-shadow: 0 4px 20px rgba(220,38,38,0.4); }
+    50% { box-shadow: 0 4px 40px rgba(220,38,38,0.8); }
+  }
+  .pb-wave-wrap {
+    background: #0f172a; border-radius: var(--radius-sm);
+    overflow: hidden; position: relative; height: 72px; flex-shrink: 0;
+  }
+  #pb-wave-canvas { display: block; width: 100%; height: 64px; }
+  .pb-wave-label {
+    position: absolute; bottom: 4px; left: 0; right: 0;
+    text-align: center; font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 11px; color: rgba(255,255,255,0.45);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .pb-transcript-box {
+    background: var(--surface); border: 2px solid var(--accent-light);
+    border-radius: var(--radius-sm); padding: 14px; box-shadow: var(--shadow); flex-shrink: 0;
+  }
+  .pb-transcript-label {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--accent); margin-bottom: 8px;
+  }
+  .pb-transcript-text {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 16px;
+    color: var(--text); line-height: 1.5; margin-bottom: 12px;
+  }
+  .pb-transcript-actions { display: flex; gap: 10px; }
+  .pb-clear-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 11px 16px; border: 2px solid var(--surface2); border-radius: 12px;
+    background: var(--surface2); color: var(--text2);
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+    cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+  }
+  .pb-clear-btn:active { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
+  .pb-gen-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 16px; border: none; border-radius: 12px;
+    background: var(--accent2); color: #fff;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 0 4px 14px rgba(5,150,105,0.3);
+  }
+  .pb-gen-btn:active { transform: scale(0.97); }
+  .pb-gen-btn:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; pointer-events: none; }
+  .pb-loading {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; padding: 30px 20px;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; color: var(--text2);
+  }
+  .pb-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex-shrink: 0; }
+  .pb-col { display: flex; flex-direction: column; gap: 8px; }
+  .pb-col-header {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; padding: 2px 0 4px;
+  }
+  .pb-col-yes .pb-col-header { color: var(--accent2); }
+  .pb-col-no .pb-col-header { color: var(--danger); }
+  .pb-item {
+    background: var(--surface); border: 2px solid var(--surface2);
+    border-radius: var(--radius-sm); padding: 8px;
+    display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow);
+  }
+  .pb-item-yes { border-color: #bbf7d0; }
+  .pb-item-no  { border-color: #fecaca; }
+  .pb-item-text {
+    width: 100%; background: var(--bg); border: 1.5px solid var(--surface2);
+    border-radius: 10px; color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 9px 10px; outline: none; resize: none; line-height: 1.4;
+    transition: border-color 0.2s;
+  }
+  .pb-item-text:focus { border-color: var(--accent); }
+  .pb-item-speak {
+    width: 100%; padding: 9px; border: none; border-radius: 10px;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px;
+  }
+  .pb-speak-yes { background: var(--accent2); color: #fff; }
+  .pb-speak-no  { background: var(--danger); color: #fff; }
+  .pb-item-speak:active { transform: scale(0.95); opacity: 0.85; }
+  @media (max-width: 380px) { .pb-answers { grid-template-columns: 1fr; } }
+  @media (min-width: 768px) {
+    .pb-item-text { font-size: 15px; }
+    .pb-col-header { font-size: 12px; }
+    .pb-mic-btn { font-size: 20px; }
+  }
+  /* ─── SETTINGS TABS ─── */
+  .stab-bar {
+    display: flex; gap: 6px; margin-bottom: 18px;
+    background: var(--surface2); border-radius: 14px; padding: 4px;
+  }
+  .stab {
+    flex: 1; padding: 10px 8px; border: none; border-radius: 11px;
+    background: transparent; color: var(--text2);
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px;
+    cursor: pointer; transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .stab.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
+  .stab:active { transform: scale(0.97); }
+
+  /* field hint */
+  .field-hint { font-size: 11px; color: var(--text2); font-weight: 600; margin-top: 5px; line-height: 1.5; }
+  .field-hint a { color: var(--accent); }
+
+  /* voice section label */
+  .voice-section-label {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--text2); margin: 14px 0 8px;
+  }
+
+  /* voice cards grid */
+  .voice-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+
+  .voice-card {
+    border: 2.5px solid var(--surface2); border-radius: var(--radius-sm);
+    background: var(--surface); padding: 12px 10px; cursor: pointer;
+    transition: all 0.18s; position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    box-shadow: var(--shadow);
+  }
+  .voice-card:hover { border-color: #93c5fd; transform: translateY(-1px); }
+  .voice-card.selected { border-color: var(--accent); background: var(--accent-light); }
+  .voice-card:active { transform: scale(0.97); }
+
+  .vc-avatar {
+    width: 64px; height: 64px; border-radius: 18px; overflow: hidden;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  }
+  .vc-avatar svg { width: 36px; height: 36px; }
+
+  .vc-info { text-align: center; width: 100%; }
+  .vc-name {
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px;
+    color: var(--text); margin-bottom: 1px;
+  }
+  .vc-age { font-size: 11px; color: var(--text2); font-weight: 700; margin-bottom: 5px; }
+  .vc-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+  .vc-tag {
+    font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 20px;
+    background: var(--surface2); color: var(--text2);
+  }
+  .voice-card.selected .vc-tag { background: #bfdbfe; color: var(--accent); }
+
+  .vc-check {
+    position: absolute; top: 7px; right: 7px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: none; align-items: center; justify-content: center;
+  }
+  .voice-card.selected .vc-check { display: flex; }
+
+  /* custom voice section */
+  .custom-voice-section { border: 2px solid var(--surface2); border-radius: var(--radius-sm); overflow: hidden; }
+  .custom-voice-toggle {
+    width: 100%; padding: 13px 14px; border: none; background: var(--surface2);
+    color: var(--text); font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s;
+  }
+  .custom-voice-toggle:hover { background: #dbeafe; color: var(--accent); }
+  .custom-voice-toggle.active { background: var(--accent-light); color: var(--accent); }
+  .custom-voice-body { padding: 14px; background: var(--surface); }
+
+  /* preset hangváltó gombok */
+  .preset-voice-btn.active {
+    border-color: var(--accent) !important;
+    background: var(--accent-light) !important;
+    color: var(--accent) !important;
+  }
+  .preset-voice-btn:active { transform: scale(0.97); }
+
+  /* ─── TABLET BETŰMÉRET (+1-2pt) ─── */
+  @media (min-width: 768px) and (max-width: 1199px) {
+    body, .field input, .field label, .modal-desc,
+    .field-hint, .save-settings, .stab, .gen-hint,
+    .pb-hint, .hw-hint { font-size: calc(1em + 1px); }
+    .header h1 { font-size: 27px; }
+    #typed-input { font-size: 27px !important; }
+    .quick-btn { font-size: 16px !important; }
+    .saved-item-text { font-size: 17px !important; }
+    .gen-item-text { font-size: 16px; }
+    .pb-transcript-text { font-size: 17px; }
+    .hw-result-text { font-size: 18px; }
+    .tab { font-size: 16px; }
+    .btn-speak { font-size: 20px !important; }
+  }
+
+    background: #f8fafc; border: 1.5px solid var(--surface2);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+  }
+  .cv-guide-title {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px;
+    color: var(--accent); display: flex; align-items: center; gap: 5px; margin-bottom: 8px;
+  }
+  .cv-steps {
+    margin: 0; padding-left: 18px;
+    font-size: 12px; color: var(--text2); font-weight: 600; line-height: 1.9;
+  }
+  .cv-steps a { color: var(--accent); }
+  .cv-steps strong { color: var(--text); }
+  .cv-steps em { font-style: normal; color: var(--accent2); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+      <h1>Hangom</h1>
+    </div>
+    <div class="header-right">
+      <div class="header-status">
+        <span class="dot" id="status-dot"></span>
+        <span id="status-text">Nincs beállítva</span>
+      </div>
+      <button class="settings-btn" id="info-btn" onclick="openInfo()" title="Súgó"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
+      <button class="settings-btn" onclick="openSettings()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+  </div>
+
+  <div class="body-wrap" id="body-wrap">
+    <div class="content">
+      <!-- PAGE 0 -->
+      <div class="page active" id="page-0">
+        <div class="output-box">
+          <textarea id="typed-input" rows="2" placeholder="Írd ide amit el szeretnél mondani…" oninput="updateCounter()"></textarea>
+          <div class="output-counter"><span id="char-count">0</span> karakter</div>
+        </div>
+        <div class="action-row">
+          <button class="btn-speak" id="speak-btn" onclick="speakTyped()">
+            <svg id="speak-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            <span id="speak-label">Felolvasás</span>
+          </button>
+          <button class="btn-icon success" title="Mentés" onclick="saveTyped()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg></button>
+          <button class="btn-icon danger" title="Törlés" onclick="clearTyped()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg></button>
+        </div>
+        <div class="section-label-row">
+          <div class="section-label">Gyors mondatok</div>
+          <button class="edit-quick-btn" id="edit-quick-toggle" onclick="toggleQuickEdit()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Szerkesztés
+          </button>
+        </div>
+        <div class="quick-scroll" id="quick-grid"></div>
+      </div>
+
+      <!-- PAGE 1 -->
+      <div class="page" id="page-1">
+        <div class="saved-top">
+          <div class="search-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-input" placeholder="Keresés a mondatok között…" oninput="filterSaved(this.value)">
+          </div>
+        </div>
+        <div class="saved-list" id="saved-list"></div>
+        <button class="add-saved-btn" onclick="openAddModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Új mondat hozzáadása
+        </button>
+      </div>
+
+      <!-- PAGE 2 -->
+      <div class="page" id="page-2">
+        <div class="gen-top">
+          <div class="gen-hint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+            Írj 2-4 kulcsszót, az AI értelmes magyar mondatokat generál. (Internet szükséges)
+          </div>
+          <input class="gen-input" id="gen-input" type="text"
+            placeholder="pl: orvos, fájdalom, segítség…"
+            onkeydown="if(event.key==='Enter')generateSentences()">
+          <button class="gen-btn" id="gen-btn" onclick="generateSentences()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5z"/></svg> Mondatok generálása
+          </button>
+        </div>
+        <div class="gen-list" id="gen-list"></div>
+      </div>
+
+      <!-- PAGE 3 – KÉZÍRÁS -->
+      <div class="page" id="page-3">
+        <div class="hw-page">
+          <div class="hw-hint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Írj a vászonra ujjal vagy tollal. Az AI felismeri és felolvastathatod a szöveget.
+          </div>
+          <div class="hw-toolbar">
+            <div class="hw-color-row">
+              <div class="hw-color active" style="background:#0f172a" data-color="#0f172a" onclick="setHwColor(this)"></div>
+              <div class="hw-color" style="background:#2563eb" data-color="#2563eb" onclick="setHwColor(this)"></div>
+            </div>
+            <div class="hw-size-row">
+              <button class="hw-size-btn" data-size="2" onclick="setHwSize(this)">S</button>
+              <button class="hw-size-btn active" data-size="4" onclick="setHwSize(this)">M</button>
+              <button class="hw-size-btn" data-size="7" onclick="setHwSize(this)">L</button>
+            </div>
+          </div>
+          <div class="hw-actions">
+            <button class="hw-btn hw-btn-clear" onclick="hwClear()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Törlés</button>
+            <button class="hw-btn hw-btn-recog" id="hw-recog-btn" onclick="hwRecognize()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg> Felismerés</button>
+          </div>
+          <div class="hw-result" id="hw-result">
+            <div class="hw-result-text" id="hw-result-text"></div>
+            <button class="hw-result-btn hw-rb-speak" title="Felolvasás" onclick="hwSpeak()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+            <button class="hw-result-btn hw-rb-send" title="Küldés a gépelő mezőbe" onclick="hwSendToTyped()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            <button class="hw-result-btn hw-rb-save" title="Mentés" onclick="hwSave()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg></button>
+          </div>
+          <div class="hw-canvas-wrap" id="hw-canvas-wrap" style="flex:1;min-height:180px;">
+            <canvas id="hw-canvas"></canvas>
+            <div class="hw-canvas-placeholder" id="hw-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Írj ide…
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 4 – PÁRBESZÉD -->
+      <div class="page" id="page-4">
+        <div class="pb-page">
+          <div class="pb-hint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;color:#2563eb"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+            Nyomd a mikrofont, tedd le a telefont magad mellé — a kérdező hangját érzékeli. Leállítás után AI generálja a válaszokat.
+          </div>
+
+          <!-- MIC GOMB + HULLÁM -->
+          <div class="pb-mic-area">
+            <button class="pb-mic-btn" id="pb-mic-btn" onclick="pbToggleMic()">
+              <svg id="pb-mic-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              <span id="pb-mic-label">Mikrofon indítása</span>
+            </button>
+            <!-- Hullám vizualizáció -->
+            <div class="pb-wave-wrap" id="pb-wave-wrap" style="display:none">
+              <canvas id="pb-wave-canvas" height="64"></canvas>
+              <div class="pb-wave-label" id="pb-wave-label">Hallgatom…</div>
+            </div>
+          </div>
+
+          <!-- Felismert szöveg -->
+          <div class="pb-transcript-box" id="pb-transcript-box" style="display:none">
+            <div class="pb-transcript-label">Felismert kérdés:</div>
+            <div class="pb-transcript-text" id="pb-transcript-text"></div>
+            <div class="pb-transcript-actions">
+              <button class="pb-clear-btn" onclick="pbReset()" title="Újra">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.89"/></svg>
+                Újra
+              </button>
+              <button class="pb-gen-btn" id="pb-gen-btn" onclick="pbGenerate()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Válaszok generálása
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div class="pb-loading" id="pb-loading" style="display:none">
+            <svg class="spin" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            <span>Átírás és generálás…</span>
+          </div>
+
+          <!-- VÁLASZOK -->
+          <div class="pb-answers" id="pb-answers" style="display:none">
+            <div class="pb-col pb-col-yes">
+              <div class="pb-col-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                IGEN – igenleges
+              </div>
+              <div class="pb-item pb-item-yes"><textarea class="pb-item-text" id="pb-yes-text-0" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-yes" onclick="pbSpeak('pb-yes-text-0')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
+              <div class="pb-item pb-item-yes"><textarea class="pb-item-text" id="pb-yes-text-1" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-yes" onclick="pbSpeak('pb-yes-text-1')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
+              <div class="pb-item pb-item-yes"><textarea class="pb-item-text" id="pb-yes-text-2" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-yes" onclick="pbSpeak('pb-yes-text-2')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
+            </div>
+            <div class="pb-col pb-col-no">
+              <div class="pb-col-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                NEM – nemleges
+              </div>
+              <div class="pb-item pb-item-no"><textarea class="pb-item-text" id="pb-no-text-0" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-no" onclick="pbSpeak('pb-no-text-0')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
+              <div class="pb-item pb-item-no"><textarea class="pb-item-text" id="pb-no-text-1" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-no" onclick="pbSpeak('pb-no-text-1')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
+              <div class="pb-item pb-item-no"><textarea class="pb-item-text" id="pb-no-text-2" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-no" onclick="pbSpeak('pb-no-text-2')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs" id="tabs">
+      <button class="tab active" onclick="switchTab(0,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>Gépelés</button>
+      <button class="tab" onclick="switchTab(1,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Mentett</button>
+      <button class="tab" onclick="switchTab(2,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5z"/></svg>Generálás</button>
+      <button class="tab" onclick="switchTab(3,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Kézírás</button>
+      <button class="tab" onclick="switchTab(4,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Párbeszéd</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-bg" id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 style="margin-bottom:16px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Beállítások
+    </h2>
+
+    <!-- TAB FEJLÉCEK -->
+    <div class="stab-bar">
+      <button class="stab active" id="stab-voice" onclick="switchSettingsTab('voice')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        Hang beállítás
+      </button>
+      <button class="stab" id="stab-ai" onclick="switchSettingsTab('ai')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5z"/></svg>
+        AI asszisztens
+      </button>
+    </div>
+
+    <!-- ═══ TAB 1: HANG BEÁLLÍTÁS ═══ -->
+    <div class="stab-panel" id="spanel-voice">
+
+      <!-- ELŐRE BEÁLLÍTOTT HANGOK VÁLTÓ -->
+      <div class="field">
+        <label>Aktív hang</label>
+        <div id="preset-voice-toggle" style="display:flex;gap:10px;">
+          <button data-preset="0" onclick="switchPresetVoice(0)"
+            style="flex:1;padding:13px;border:2.5px solid var(--surface2);border-radius:var(--radius-sm);
+            background:var(--surface);font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;
+            color:var(--text2);cursor:pointer;transition:all 0.18s;"
+            class="preset-voice-btn">
+            🎙 1. hang
+          </button>
+          <button data-preset="1" onclick="switchPresetVoice(1)"
+            style="flex:1;padding:13px;border:2.5px solid var(--surface2);border-radius:var(--radius-sm);
+            background:var(--surface);font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;
+            color:var(--text2);cursor:pointer;transition:all 0.18s;"
+            class="preset-voice-btn">
+            🎙 2. hang
+          </button>
+        </div>
+        <div class="field-hint">Váltás azonnal érvényes. Az aktív gomb kék kerettel jelölt.</div>
+      </div>
+
+      <!-- ElevenLabs API kulcs (mindkét módhoz kell) -->
+      <div class="field">
+        <label>ElevenLabs API kulcs</label>
+        <input type="password" id="api-key-input" placeholder="sk_…">
+        <div class="field-hint">Szükséges minden hanghoz. Létrehozás: <a href="https://elevenlabs.io/app/home" target="_blank">elevenlabs.io</a> → bal felső menü → ElevenAPI → API Keys</div>
+      </div>
+
+      <!-- EGYEDI HANG -->
+      <div class="cv-guide" style="margin-bottom:16px;">
+        <div class="cv-guide-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Hogyan hozd létre saját hangod?
+        </div>
+        <ol class="cv-steps">
+          <li>Menj: <a href="https://elevenlabs.io/app/home" target="_blank">elevenlabs.io</a> → regisztrálj</li>
+          <li>Kattints a <strong>Voices+</strong> menüre, majd <strong>Create voice</strong></li>
+          <li>Válaszd az <strong>Instant Voice Clone</strong> (előfizetés) vagy <strong>Voice Design</strong> (ingyenes) opciót</li>
+          <li><strong>API kulcs:</strong> bal felső menü → <em>ElevenAPI</em> → <em>API Keys</em> → új létrehozása</li>
+          <li><strong>Hang ID:</strong> <em>Voices → My Voices</em> alatt, a hangod neve mellett: <em>Copy Voice ID</em></li>
+        </ol>
+      </div>
+
+      <div class="field" style="margin-top:4px">
+        <label>Személyes hang kód (Voice ID)</label>
+        <input type="text" id="voice-id-input" placeholder="pl: 21m00Tcm4TlvDq8ikWAM">
+      </div>
+      <div class="field">
+        <label>Modell (opcionális)</label>
+        <input type="text" id="model-id-input" placeholder="eleven_turbo_v2_5">
+      </div>
+
+      <button class="save-settings" onclick="saveCustomVoice()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Mentés &amp; teszt
+      </button>
+
+    </div><!-- /spanel-voice -->
+
+    <!-- ═══ TAB 2: AI ASSZISZTENS ═══ -->
+    <div class="stab-panel" id="spanel-ai" style="display:none">
+      <div class="modal-desc" style="margin-bottom:16px;">
+        Az AI funkciókhoz (mondat generálás, kézírás felismerés, párbeszéd) Groq API kulcs szükséges. Az előre beállított kulcs automatikusan be van töltve – csak akkor módosítsd, ha új kulcsot szeretnél használni.
+      </div>
+      <div class="cv-guide" style="margin-bottom:16px;">
+        <div class="cv-guide-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Hogyan szerezd meg a Groq API kulcsot?
+        </div>
+        <ol class="cv-steps">
+          <li>Menj: <a href="https://console.groq.com" target="_blank">console.groq.com</a></li>
+          <li>Regisztrálj Google fiókoddal (ingyenes)</li>
+          <li><strong>API Keys</strong> menü → <strong>Create API Key</strong></li>
+          <li>Másold ki a kulcsot (gsk_… formátum)</li>
+        </ol>
+      </div>
+      <div class="field">
+        <label>Groq API kulcs</label>
+        <input type="password" id="groq-key-input" placeholder="gsk_…">
+      </div>
+      <button class="save-settings" onclick="saveGroqKey()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Mentés
+      </button>
+    </div><!-- /spanel-ai -->
+
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-bg" id="add-modal" onclick="if(event.target===this)closeAddModal()">
+  <div class="add-modal">
+    <div class="modal-handle"></div>
+    <h2><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg> <span id="add-modal-title">Új mondat</span></h2>
+    <textarea class="add-textarea" id="add-textarea" placeholder="Írd be a mondatot…"></textarea>
+    <button class="add-confirm" onclick="confirmAdd()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mentés</button>
+  </div>
+</div>
+
+<!-- GYORS MONDAT SZERKESZTŐ MODAL -->
+<div class="modal-bg" id="qedit-modal" onclick="if(event.target===this)closeQEdit()">
+  <div class="qedit-modal">
+    <div class="modal-handle"></div>
+    <h2><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Gyors mondat szerkesztése</h2>
+    <input class="qedit-input" id="qedit-input" type="text" placeholder="Mondat szövege…">
+    <div class="qedit-actions">
+      <button class="qedit-save" onclick="saveQEdit()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mentés</button>
+      <button class="qedit-del" onclick="deleteQEdit()" title="Törlés"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><svg id="toast-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-msg"></span></div>
+
+<script>
+let apiKey='', voiceId='', modelId='eleven_turbo_v2_5', groqKey='';
+let currentAudio=null, isSpeaking=false, editingIdx=-1;
+let savedPhrases=[];
+
+const DEFAULT_QUICK=[
+  "Igen","Nem","Igen, köszönöm","Most nem, köszönöm",
+  "Köszönöm","Szia","Hogy vagy?","Mesélj",
+  "Jól vagyok","Minden rendben","Nem érzem jól magam","Fájdalom van",
+  "Hívd az orvost, kérlek","Tudnál segíteni?","Tudnál jönni segíteni, kérlek?","Egy pillanat, mindjárt gépelem",
+  "Nem értem","Ismételd meg, kérlek",
+];
+
+function init(){
+  // Preset hang betöltése (alapértelmezett: 2. hang = index 1)
+  activePresetVoice = parseInt(localStorage.getItem('active_preset_voice') ?? '1');
+  if(isNaN(activePresetVoice)||activePresetVoice<0||activePresetVoice>1) activePresetVoice=1;
+  const pv = PRESET_VOICES[activePresetVoice];
+  apiKey  = localStorage.getItem('el_api')   || pv.apiKey;
+  voiceId = localStorage.getItem('el_voice') || pv.voiceId;
+  modelId = localStorage.getItem('el_model') || 'eleven_turbo_v2_5'; if(modelId==='eleven_multilingual_v2'){modelId='eleven_turbo_v2_5';localStorage.setItem('el_model',modelId);}
+  groqKey = localStorage.getItem('groq_api') || DEFAULT_GROQ_KEY;
+  selectedVoiceType = localStorage.getItem('voice_type') || 'custom';
+  // Ha nincs mentett egyéni beállítás, a preset értékeket használjuk alapból
+  if(!localStorage.getItem('el_api')) { apiKey=pv.apiKey; voiceId=pv.voiceId; modelId=pv.modelId; }
+  if(!localStorage.getItem('groq_api')) { groqKey=DEFAULT_GROQ_KEY; }
+  savedPhrases = JSON.parse(localStorage.getItem('saved_phrases')||'[]');
+  const stored=localStorage.getItem('quick_phrases');
+  if(stored) quickPhrases=JSON.parse(stored);
+  document.getElementById('api-key-input').value  = apiKey;
+  const vid = document.getElementById('voice-id-input');
+  if(vid) vid.value = voiceId;
+  document.getElementById('model-id-input').value = modelId!=='eleven_turbo_v2_5' ? modelId : '';
+  document.getElementById('groq-key-input').value = groqKey;
+  renderPresetVoiceToggle();
+  setupLayout();
+  updateStatus();
+  renderQuickGrid();
+  renderSaved();
+}
+
+/* ── LAYOUT: tabs sidebar on tablet ── */
+function setupLayout(){
+  const wrap = document.getElementById('body-wrap');
+  const tabs = document.getElementById('tabs');
+  function apply(){
+    if(window.innerWidth>=768){
+      wrap.style.flexDirection='row';
+      if(wrap.firstElementChild!==tabs) wrap.insertBefore(tabs, wrap.firstElementChild);
+    } else {
+      wrap.style.flexDirection='column';
+      wrap.appendChild(tabs);
+    }
+  }
+  apply();
+  window.addEventListener('resize', apply);
+}
+
+function updateStatus(){
+  const dot=document.getElementById('status-dot');
+  const txt=document.getElementById('status-text');
+  if(apiKey&&voiceId){ dot.className='dot ok'; txt.textContent='Hang kész'; }
+  else { dot.className='dot err'; txt.textContent='Nincs beállítva'; }
+}
+
+function switchTab(idx,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('page-'+idx).classList.add('active');
+  if(idx===1){ document.getElementById('search-input').value=''; renderSaved(); }
+  if(idx===3){ setTimeout(()=>{ if(!hwCtx) initHwCanvas(); },50); }
+}
+
+function updateCounter(){
+  document.getElementById('char-count').textContent=document.getElementById('typed-input').value.length;
+}
+
+function clearTyped(){
+  document.getElementById('typed-input').value='';
+  updateCounter();
+}
+
+/* ── SPEAK ── */
+async function speakText(text){
+  if(!text||!text.trim()){ toast('Nincs szöveg!','error','ti-alert-circle'); return null; }
+  if(!apiKey||!voiceId){ openSettings(); toast('Először add meg az API kulcsot!','error','ti-settings'); return null; }
+  if(currentAudio){ currentAudio.pause(); currentAudio=null; }
+  try{
+    const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,{
+      method:'POST',
+      headers:{'xi-api-key':apiKey,'Content-Type':'application/json','Accept':'audio/mpeg'},
+      body:JSON.stringify({
+        text, model_id:modelId||'eleven_turbo_v2_5', language_code:'hu',
+        voice_settings:{stability:0.5,similarity_boost:0.85,style:0.2,use_speaker_boost:true}
+      })
+    });
+    if(!res.ok){
+      let msg='API hiba: '+res.status;
+      try{const j=await res.json(); msg=j.detail?.message||msg;}catch(_){}
+      throw new Error(msg);
+    }
+    const blob=await res.blob();
+    const audio=new Audio(URL.createObjectURL(blob));
+    currentAudio=audio;
+    audio.play();
+    return audio;
+  }catch(e){
+    toast(e.message||'Hiba történt','error','ti-alert-circle');
+    return null;
+  }
+}
+
+async function speakTyped(){
+  if(isSpeaking){
+    if(currentAudio){currentAudio.pause();currentAudio=null;}
+    setSpeakState(false); return;
+  }
+  const text=document.getElementById('typed-input').value.trim();
+  if(!text) return;
+  setSpeakState('loading');
+  const audio=await speakText(text);
+  if(audio){
+    setSpeakState('playing');
+    audio.onended=()=>setSpeakState(false);
+    audio.onerror=()=>setSpeakState(false);
+  } else { setSpeakState(false); }
+}
+
+function setSpeakState(state){
+  const btn=document.getElementById('speak-btn');
+  const label=document.getElementById('speak-label');
+  // Replace icon element cleanly
+  const oldIcon=document.getElementById('speak-icon');
+  const newIcon=document.createElement('i');
+  newIcon.id='speak-icon';
+  if(state==='loading'){
+    btn.className='btn-speak loading';
+    newIcon.className='ti ti-loader-2 spin';
+    label.textContent='Betöltés…';
+    isSpeaking=false;
+  } else if(state==='playing'){
+    btn.className='btn-speak playing';
+    newIcon.className='ti ti-player-stop';
+    label.textContent='Leállítás';
+    isSpeaking=true;
+  } else {
+    btn.className='btn-speak';
+    newIcon.className='ti ti-volume';
+    label.textContent='Felolvasás';
+    isSpeaking=false;
+  }
+  oldIcon.replaceWith(newIcon);
+}
+
+async function quickSpeak(phrase){
+  document.getElementById('typed-input').value=phrase;
+  updateCounter();
+  if(isSpeaking&&currentAudio){currentAudio.pause();currentAudio=null;setSpeakState(false);}
+  setSpeakState('loading');
+  const audio=await speakText(phrase);
+  if(audio){
+    setSpeakState('playing');
+    audio.onended=()=>setSpeakState(false);
+    audio.onerror=()=>setSpeakState(false);
+  } else { setSpeakState(false); }
+}
+
+let quickPhrases=[...DEFAULT_QUICK];
+let quickEditMode=false, qEditIdx=-1;
+
+function persistQuick(){ localStorage.setItem('quick_phrases',JSON.stringify(quickPhrases)); }
+
+function renderQuickGrid(){
+  const grid=document.getElementById('quick-grid');
+  grid.innerHTML='';
+  quickPhrases.forEach((phrase,idx)=>{
+    const btn=document.createElement('button');
+    btn.className='quick-btn'+(quickEditMode?' edit-mode':'');
+    btn.textContent=phrase;
+    if(quickEditMode){
+      btn.addEventListener('click',()=>openQEdit(idx));
+    } else {
+      btn.addEventListener('click',()=>quickSpeak(phrase));
+    }
+    grid.appendChild(btn);
+  });
+  // "+" gomb szerkesztő módban
+  if(quickEditMode){
+    const add=document.createElement('button');
+    add.className='quick-btn edit-mode';
+    add.innerHTML='<svg style="font-size:22px;" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+    add.style.cssText='border-color:#22c55e;background:#f0fdf4;color:#16a34a;';
+    add.addEventListener('click',()=>openQEdit(-1));
+    grid.appendChild(add);
+  }
+}
+
+function toggleQuickEdit(){
+  quickEditMode=!quickEditMode;
+  const btn=document.getElementById('edit-quick-toggle');
+  if(quickEditMode){
+    btn.classList.add('active');
+    btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Kész';
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Szerkesztés';
+  }
+  renderQuickGrid();
+}
+
+function openQEdit(idx){
+  qEditIdx=idx;
+  document.getElementById('qedit-input').value=idx>=0?quickPhrases[idx]:'';
+  document.getElementById('qedit-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('qedit-input').focus(),200);
+}
+function closeQEdit(){ document.getElementById('qedit-modal').classList.remove('open'); }
+
+function saveQEdit(){
+  const text=document.getElementById('qedit-input').value.trim();
+  if(!text) return;
+  if(qEditIdx>=0){ quickPhrases[qEditIdx]=text; toast('Módosítva!','success','ti-check'); }
+  else { quickPhrases.push(text); toast('Hozzáadva!','success','ti-plus'); }
+  persistQuick(); closeQEdit(); renderQuickGrid();
+}
+
+function deleteQEdit(){
+  if(qEditIdx<0){closeQEdit();return;}
+  quickPhrases.splice(qEditIdx,1);
+  persistQuick(); closeQEdit(); renderQuickGrid();
+  toast('Törölve','','ti-trash');
+}
+
+/* ── KÉZÍRÁS FELISMERÉS ── */
+let hwCanvas, hwCtx, hwDrawing=false, hwHasContent=false;
+let hwColor='#0f172a', hwSize=4, hwLastX=0, hwLastY=0;
+
+function initHwCanvas(){
+  hwCanvas=document.getElementById('hw-canvas');
+  if(!hwCanvas) return;
+  const wrap=document.getElementById('hw-canvas-wrap');
+  hwCanvas.width=wrap.clientWidth||400;
+  hwCanvas.height=wrap.clientHeight||300;
+  hwCtx=hwCanvas.getContext('2d');
+  hwCtx.fillStyle='#ffffff';
+  hwCtx.fillRect(0,0,hwCanvas.width,hwCanvas.height);
+  hwCtx.strokeStyle=hwColor;
+  hwCtx.lineWidth=hwSize;
+  hwCtx.lineCap='round';
+  hwCtx.lineJoin='round';
+
+  // Touch events (ujj + toll)
+  hwCanvas.addEventListener('pointerdown',hwStart,{passive:false});
+  hwCanvas.addEventListener('pointermove',hwMove,{passive:false});
+  hwCanvas.addEventListener('pointerup',hwEnd);
+  hwCanvas.addEventListener('pointercancel',hwEnd);
+  hwCanvas.addEventListener('pointerleave',hwEnd);
+}
+
+function hwGetPos(e){
+  const rect=hwCanvas.getBoundingClientRect();
+  const scaleX=hwCanvas.width/rect.width;
+  const scaleY=hwCanvas.height/rect.height;
+  return { x:(e.clientX-rect.left)*scaleX, y:(e.clientY-rect.top)*scaleY };
+}
+
+function hwStart(e){
+  e.preventDefault();
+  hwDrawing=true;
+  const pos=hwGetPos(e);
+  hwLastX=pos.x; hwLastY=pos.y;
+  hwCtx.beginPath();
+  hwCtx.arc(pos.x,pos.y,hwSize/2,0,Math.PI*2);
+  hwCtx.fillStyle=hwColor;
+  hwCtx.fill();
+  if(!hwHasContent){
+    hwHasContent=true;
+    document.getElementById('hw-placeholder').style.display='none';
+  }
+}
+
+function hwMove(e){
+  e.preventDefault();
+  if(!hwDrawing) return;
+  const pos=hwGetPos(e);
+  hwCtx.beginPath();
+  hwCtx.strokeStyle=hwColor;
+  hwCtx.lineWidth=hwSize;
+  hwCtx.moveTo(hwLastX,hwLastY);
+  hwCtx.lineTo(pos.x,pos.y);
+  hwCtx.stroke();
+  hwLastX=pos.x; hwLastY=pos.y;
+}
+
+function hwEnd(){ hwDrawing=false; }
+
+function hwClear(){
+  if(!hwCtx) return;
+  hwCtx.fillStyle='#ffffff';
+  hwCtx.fillRect(0,0,hwCanvas.width,hwCanvas.height);
+  hwHasContent=false;
+  document.getElementById('hw-placeholder').style.display='flex';
+  document.getElementById('hw-result').classList.remove('visible');
+}
+
+function setHwColor(el){
+  hwColor=el.dataset.color;
+  document.querySelectorAll('.hw-color').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setHwSize(el){
+  hwSize=parseInt(el.dataset.size);
+  document.querySelectorAll('.hw-size-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function hwRecognize(){
+  if(!hwHasContent){toast('Először írj valamit!','error','ti-alert-circle');return;}
+  if(!groqKey){toast('Add meg a Groq API kulcsot a beállításokban!','error','ti-settings');openSettings();return;}
+
+  const btn=document.getElementById('hw-recog-btn');
+  btn.disabled=true;
+  btn.innerHTML='<svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Felismerés…';
+
+  try{
+    // Képelőkészítés: 2-3x upscale + kontraszt erősítés → jobb OCR pontosság
+    const srcW=hwCanvas.width, srcH=hwCanvas.height;
+    const scale=Math.min(3, Math.max(2, 1400/srcW));
+    const offCanvas=document.createElement('canvas');
+    offCanvas.width=srcW*scale; offCanvas.height=srcH*scale;
+    const offCtx=offCanvas.getContext('2d');
+    offCtx.fillStyle='#ffffff';
+    offCtx.fillRect(0,0,offCanvas.width,offCanvas.height);
+    offCtx.imageSmoothingEnabled=true;
+    offCtx.imageSmoothingQuality='high';
+    offCtx.drawImage(hwCanvas,0,0,offCanvas.width,offCanvas.height);
+
+    // Binarizálás: halvány vonalak → tiszta fekete, háttér → tiszta fehér
+    const imgData=offCtx.getImageData(0,0,offCanvas.width,offCanvas.height);
+    const d=imgData.data;
+    for(let i=0;i<d.length;i+=4){
+      const lum=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+      const v=lum<210?0:255;
+      d[i]=d[i+1]=d[i+2]=v;
+    }
+    offCtx.putImageData(imgData,0,0);
+
+    // PNG: veszteségmentes, nincs JPEG tömörítési zaj
+    const dataUrl=offCanvas.toDataURL('image/png');
+    const base64=dataUrl.split(',')[1];
+
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({
+        model:'meta-llama/llama-4-scout-17b-16e-instruct',
+        max_tokens:300,
+        temperature:0.1,
+        messages:[
+          {
+            role:'system',
+            content:'Te egy precíz OCR rendszer vagy. Feladatod kézírott szöveg pontos átírása. Mindig CSAK a látható szöveget add vissza, semmi mást.'
+          },
+          {
+            role:'user',
+            content:[
+              {type:'image_url', image_url:{url:'data:image/png;base64,'+base64, detail:'high'}},
+              {type:'text', text:`Ez egy kézírás-felismerő alkalmazás vásznáról készült kép. A felhasználó ujjával vagy tollal írt rá szöveget fehér alapon fekete tintával.
+
+FELADATOD: Olvasd el a kézzel írt szöveget és írd át pontosan.
+
+SZABÁLYOK:
+1. CSAK a felismert szöveget add vissza – semmi magyarázat, kommentár, idézőjel
+2. Tartsd meg az eredeti sortöréseket
+3. Ha bizonytalan egy betű, a kontextus alapján válaszd a legvalószínűbbet
+4. Magyar szövegnél tartsd meg az ékezeteket: á é í ó ö ő ú ü ű
+5. Ha semmi nem olvasható: [nem olvasható]`}
+            ]
+          }
+        ]
+      })
+    });
+
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error?.message||'Groq API hiba: '+res.status);
+    }
+
+    const data=await res.json();
+    const text=(data.choices?.[0]?.message?.content||'').trim();
+    if(!text||text==='[nem olvasható]'){
+      toast('Nem sikerült felismerni – próbálj nagyobb, tisztább betűket!','error','ti-alert-circle');
+    } else {
+      document.getElementById('hw-result-text').textContent=text;
+      document.getElementById('hw-result').classList.add('visible');
+      toast('Szöveg felismerve!','success','ti-scan');
+    }
+  }catch(e){
+    toast(e.message||'Hiba történt','error','ti-alert-circle');
+  }
+
+  btn.disabled=false;
+  btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg> Felismerés';
+}
+
+function hwSpeak(){
+  const text=document.getElementById('hw-result-text').textContent;
+  if(text) speakText(text);
+}
+
+function hwSendToTyped(){
+  const text=document.getElementById('hw-result-text').textContent;
+  if(!text) return;
+  document.getElementById('typed-input').value=text;
+  updateCounter();
+  switchTab(0,document.querySelectorAll('.tab')[0]);
+  toast('Szöveg áthelyezve!','success','ti-send');
+}
+
+function hwSave(){
+  const text=document.getElementById('hw-result-text').textContent;
+  if(!text) return;
+  if(savedPhrases.includes(text)){toast('Már el van mentve!','','ti-info-circle');return;}
+  savedPhrases.unshift(text); persistSaved(); renderSaved();
+  toast('Elmentve!','success','ti-bookmark-check');
+}
+
+/* ── SAVE ── */
+function saveTyped(){
+  const text=document.getElementById('typed-input').value.trim();
+  if(!text){toast('Nincs szöveg!','error','ti-alert-circle');return;}
+  if(savedPhrases.includes(text)){toast('Már el van mentve!','','ti-info-circle');return;}
+  savedPhrases.unshift(text);
+  persistSaved(); renderSaved();
+  toast('Elmentve!','success','ti-bookmark-check');
+}
+
+function persistSaved(){ localStorage.setItem('saved_phrases',JSON.stringify(savedPhrases)); }
+
+function renderSaved(filter=''){
+  const list=document.getElementById('saved-list');
+  list.innerHTML='';
+  const lc=filter.toLowerCase();
+  const filtered=filter?savedPhrases.filter(p=>p.toLowerCase().includes(lc)):savedPhrases;
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>${filter?'Nincs találat.':'Még nincsenek elmentett mondatok.<br>Gépelj valamit és mentsd el!'}</div>`;
+    return;
+  }
+  filtered.forEach(phrase=>{
+    const realIdx=savedPhrases.indexOf(phrase);
+    const item=document.createElement('div'); item.className='saved-item';
+    const txt=document.createElement('div'); txt.className='saved-item-text'; txt.textContent=phrase;
+    const play=document.createElement('button'); play.className='si-btn si-play'; play.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+    play.addEventListener('click',()=>speakText(phrase));
+    const edit=document.createElement('button'); edit.className='si-btn si-edit'; edit.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    edit.addEventListener('click',()=>editSaved(realIdx));
+    const del=document.createElement('button'); del.className='si-btn si-del'; del.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    del.addEventListener('click',()=>deleteSaved(realIdx));
+    item.append(txt,play,edit,del); list.appendChild(item);
+  });
+}
+
+function filterSaved(val){ renderSaved(val); }
+
+function deleteSaved(idx){
+  if(!confirm('Biztosan törlöd?')) return;
+  savedPhrases.splice(idx,1); persistSaved(); renderSaved();
+  toast('Törölve','','ti-trash');
+}
+
+function editSaved(idx){
+  editingIdx=idx;
+  document.getElementById('add-textarea').value=savedPhrases[idx];
+  document.getElementById('add-modal-title').textContent='Szerkesztés';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function openAddModal(){
+  editingIdx=-1;
+  document.getElementById('add-textarea').value='';
+  document.getElementById('add-modal-title').textContent='Új mondat';
+  document.getElementById('add-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('add-textarea').focus(),200);
+}
+function closeAddModal(){ document.getElementById('add-modal').classList.remove('open'); }
+
+function confirmAdd(){
+  const text=document.getElementById('add-textarea').value.trim();
+  if(!text) return;
+  if(editingIdx>=0){
+    savedPhrases[editingIdx]=text;
+    toast('Módosítva!','success','ti-check');
+  } else {
+    if(savedPhrases.includes(text)){toast('Már létezik!','','ti-info-circle');return;}
+    savedPhrases.unshift(text);
+    toast('Elmentve!','success','ti-bookmark-check');
+  }
+  persistSaved(); renderSaved(); closeAddModal();
+}
+
+/* ── GENERÁLÁS – Groq API (Llama 3.3 70B) ── */
+async function generateSentences(){
+  const input=document.getElementById('gen-input').value.trim();
+  if(!input){toast('Írj be kulcsszavakat!','error','ti-alert-circle');return;}
+  if(!groqKey){
+    toast('Add meg a Groq API kulcsot a beállításokban!','error','ti-settings');
+    openSettings(); return;
+  }
+
+  const btn=document.getElementById('gen-btn');
+  const list=document.getElementById('gen-list');
+  btn.disabled=true;
+  btn.innerHTML='<svg class="spin" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Generálás…';
+  list.innerHTML=`<div class="empty-state"><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg><br>Mondatok generálása…</div>`;
+
+  try{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+groqKey
+      },
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:500,
+        messages:[{
+          role:'user',
+          content:`Te egy AAC (Augmentative and Alternative Communication) alkalmazás vagy, néma vagy súlyosan beszédkorlátozott embereknek.
+
+A felhasználó ezeket a kulcsszavakat írta be: "${input}"
+
+FELADAT: Generálj pontosan 5 rövid, természetes MAGYAR mondatot, amelyeket ez a személy el szeretne mondani a környezetének.
+
+FONTOS SZABÁLYOK:
+1. Minden mondat FŰZZE ÖSSZE az összes megadott szót/fogalmat egyetlen értelmes gondolatba
+2. Maximum 10 szó mondatonként
+3. Változatos mondattípusok: kérdés, kérés, közlés, megerősítés, tagadás
+4. Hétköznapi, természetes magyar beszéd – ne legyen mesterkélt
+5. Gondolj arra, mit mondana valóban egy ember ebben a helyzetben
+
+CSAK az 5 mondatot írd ki, soronként egyet, semmi más szöveg, semmi számozás.`
+        }]
+      })
+    });
+
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error?.message||'Groq API hiba: '+res.status);
+    }
+
+    const data=await res.json();
+    const raw=(data.choices?.[0]?.message?.content||'').trim();
+    const mondatok=raw.split('\n')
+      .map(s=>s.replace(/^\d+[\.\)\-\s]*/,'').trim())
+      .filter(s=>s.length>3&&s.length<120)
+      .slice(0,5);
+
+    if(!mondatok.length)throw new Error('Üres válasz érkezett');
+
+    list.innerHTML='';
+    mondatok.forEach(s=>{
+      const item=document.createElement('div');item.className='gen-item';
+      const txt=document.createElement('div');txt.className='gen-item-text';txt.textContent=s;
+      const play=document.createElement('button');play.className='gi-btn gi-play';play.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
+      play.addEventListener('click',()=>speakText(s));
+      const save=document.createElement('button');save.className='gi-btn gi-save';save.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>';
+      save.addEventListener('click',()=>saveGenerated(s,save));
+      item.append(txt,play,save);list.appendChild(item);
+    });
+
+  }catch(e){
+    list.innerHTML=`<div class="empty-state"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>${e.message||'Hiba – ellenőrizd az internetkapcsolatot!'}</span></div>`;
+  }
+
+  btn.disabled=false;
+  btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5z"/></svg> Mondatok generálása';
+}
+
+function saveGenerated(text,btn){
+  if(savedPhrases.includes(text)){toast('Már el van mentve!','','ti-info-circle');return;}
+  savedPhrases.unshift(text); persistSaved(); renderSaved();
+  btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><polyline points="9 11 12 14 22 4"/></svg>';
+  btn.style.cssText='background:var(--accent2-light);color:var(--accent2);pointer-events:none;';
+  toast('Elmentve!','success','ti-bookmark-check');
+}
+
+/* ── SETTINGS ── */
+// Beépített hangok
+const BUILTIN_VOICES = [
+  { name:'Sára',    age:'24 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+  { name:'Bence',   age:'27 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+  { name:'Katalin', age:'46 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+  { name:'László',  age:'51 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+];
+
+// ── ELŐRE BEÁLLÍTOTT 2 SZEMÉLYES HANG ──
+const PRESET_VOICES = [
+  {
+    label: '1. hang',
+    apiKey: '7bfcba4d8d85727352d561b553a3f48c3fe1d639b4da4702ec2f2ae002cdeb19',
+    voiceId: 'W2jI4jvUDEiN9Rutb4yM',
+    modelId: 'eleven_turbo_v2_5'
+  },
+  {
+    label: '2. hang',
+    apiKey: 'c3d0f23fda7e0ac0687270989352e94eed735592d16855905a906026ea0d64e2',
+    voiceId: 'k3magzxSaDMTHu6FBz7c',
+    modelId: 'eleven_turbo_v2_5'
+  }
+];
+const DEFAULT_GROQ_KEY = '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';
+
+let selectedVoiceType = 'custom'; // 'builtin-0'..'builtin-3' | 'custom'
+let activePresetVoice = 1; // 0 = 1. hang, 1 = 2. hang (alapértelmezett)
+
+function switchSettingsTab(tab){
+  document.getElementById('stab-voice').classList.toggle('active', tab==='voice');
+  document.getElementById('stab-ai').classList.toggle('active', tab==='ai');
+  document.getElementById('spanel-voice').style.display = tab==='voice' ? '' : 'none';
+  document.getElementById('spanel-ai').style.display   = tab==='ai'    ? '' : 'none';
+}
+
+function selectBuiltinVoice(idx){
+  // Kártya kijelölés
+  document.querySelectorAll('.voice-card').forEach((c,i)=>c.classList.toggle('selected', i===idx));
+  // Egyedi panel bezárása, toggle gomb visszaállítása
+  document.getElementById('custom-voice-body').style.display='none';
+  document.getElementById('custom-voice-toggle').classList.remove('active');
+  document.getElementById('custom-voice-chevron').style.transform='rotate(0deg)';
+  selectedVoiceType = 'builtin-'+idx;
+  const v = BUILTIN_VOICES[idx];
+  voiceId = v.voiceId;
+  modelId = v.modelId;
+  localStorage.setItem('el_voice', voiceId);
+  localStorage.setItem('el_model', modelId);
+  localStorage.setItem('voice_type', selectedVoiceType);
+  updateStatus();
+  if(voiceId) toast(v.name+' hang kiválasztva!','success','ti-check');
+  else toast(v.name+' – Voice ID hamarosan!','','ti-info-circle');
+}
+
+function toggleCustomVoice(){
+  const body = document.getElementById('custom-voice-body');
+  const chevron = document.getElementById('custom-voice-chevron');
+  const toggle = document.getElementById('custom-voice-toggle');
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  chevron.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+  toggle.classList.toggle('active', open);
+  if(open){
+    // Kártyák kijelölés törlése
+    document.querySelectorAll('.voice-card').forEach(c=>c.classList.remove('selected'));
+    selectedVoiceType = 'custom';
+  }
+}
+
+function saveCustomVoice(){
+  apiKey  = document.getElementById('api-key-input').value.trim();
+  voiceId = document.getElementById('voice-id-input').value.trim();
+  modelId = document.getElementById('model-id-input').value.trim() || 'eleven_turbo_v2_5';
+  if(!apiKey){ toast('Add meg az ElevenLabs API kulcsot!','error','ti-alert-circle'); return; }
+  if(!voiceId){ toast('Add meg a Hang ID-t!','error','ti-alert-circle'); return; }
+  localStorage.setItem('el_api',   apiKey);
+  localStorage.setItem('el_voice', voiceId);
+  localStorage.setItem('el_model', modelId);
+  localStorage.setItem('voice_type','custom');
+  selectedVoiceType = 'custom';
+  updateStatus(); closeSettings();
+  toast('Saját hang mentve! Tesztelés…','success','ti-check');
+  setTimeout(()=>speakText('Helló! A saját hangom sikeresen be van állítva.'),400);
+}
+
+function saveGroqKey(){
+  groqKey = document.getElementById('groq-key-input').value.trim();
+  if(!groqKey){ toast('Add meg a Groq API kulcsot!','error','ti-alert-circle'); return; }
+  localStorage.setItem('groq_api', groqKey);
+  toast('Groq API kulcs elmentve!','success','ti-check');
+}
+
+// ── PRESET HANGVÁLTÓ ──
+function renderPresetVoiceToggle(){
+  const el=document.getElementById('preset-voice-toggle');
+  if(!el) return;
+  PRESET_VOICES.forEach((v,i)=>{
+    const btn=el.querySelector('[data-preset="'+i+'"]');
+    if(btn) btn.classList.toggle('active', i===activePresetVoice);
+  });
+}
+
+function switchPresetVoice(idx){
+  activePresetVoice=idx;
+  const pv=PRESET_VOICES[idx];
+  apiKey=pv.apiKey; voiceId=pv.voiceId; modelId=pv.modelId;
+  localStorage.setItem('active_preset_voice', idx);
+  // Töröljük az egyéni beállításokat, hogy a preset érvényesüljön
+  localStorage.removeItem('el_api');
+  localStorage.removeItem('el_voice');
+  localStorage.removeItem('el_model');
+  document.getElementById('api-key-input').value=apiKey;
+  const vid=document.getElementById('voice-id-input');
+  if(vid) vid.value=voiceId;
+  renderPresetVoiceToggle();
+  updateStatus();
+  toast(pv.label+' beállítva!','success','ti-check');
+}
+
+// Legacy – megtartjuk kompatibilitás miatt
+async function saveSettings(){
+  saveCustomVoice();
+}
+
+function openSettings(){
+  document.getElementById('settings-modal').classList.add('open');
+  // Visszaállítás: API key mező feltöltése
+  document.getElementById('api-key-input').value = apiKey;
+  const vid = document.getElementById('voice-id-input');
+  if(vid) vid.value = selectedVoiceType==='custom' ? voiceId : '';
+  const mid = document.getElementById('model-id-input');
+  if(mid) mid.value = modelId!=='eleven_turbo_v2_5' ? modelId : '';
+  document.getElementById('groq-key-input').value = groqKey;
+  // Kártya kijelölés visszaállítása
+  document.querySelectorAll('.voice-card').forEach((c,i)=>{
+    c.classList.toggle('selected', selectedVoiceType==='builtin-'+i);
+  });
+  // Egyedi panel open ha custom volt
+  if(selectedVoiceType==='custom' && voiceId){
+    document.getElementById('custom-voice-body').style.display='';
+    document.getElementById('custom-voice-toggle').classList.add('active');
+    document.getElementById('custom-voice-chevron').style.transform='rotate(180deg)';
+  }
+  renderPresetVoiceToggle();
+}
+function closeSettings(){ document.getElementById('settings-modal').classList.remove('open'); }
+
+/* ── TOAST ── */
+function toast(msg,type='',icon='ti-check'){
+  const el=document.getElementById('toast');
+  document.getElementById('toast-icon').className='ti '+icon;
+  document.getElementById('toast-msg').textContent=msg;
+  el.className='toast show'+(type?' '+type:'');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+/* ── PÁRBESZÉD – Groq Whisper STT + AI válaszok + hullám vizualizáció ── */
+let pbMediaRecorder=null, pbAudioChunks=[], pbRecording=false, pbTranscript='';
+let pbAudioCtx=null, pbAnalyser=null, pbMicStream=null, pbWaveRAF=null;
+
+function pbToggleMic(){
+  if(pbRecording){ pbStopMic(); return; }
+  pbStartMic();
+}
+
+async function pbStartMic(){
+  if(!groqKey){
+    toast('Add meg a Groq API kulcsot a beállításokban!','error','ti-settings');
+    openSettings(); return;
+  }
+
+  // Android Chrome: getUserMedia csak HTTPS-en vagy localhost-on működik
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    toast('A mikrofon nem elérhető. Nyisd meg HTTPS-en (pl. GitHub Pages, Netlify)!','error','ti-alert-circle');
+    return;
+  }
+
+  try{
+    // Android Chrome-on explicit constraints segítenek az engedélykérés megjelenítésében
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleRate: 16000
+      }
+    });
+    pbMicStream = stream;
+
+    // Waveform vizualizáció
+    pbAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    pbAnalyser = pbAudioCtx.createAnalyser();
+    pbAnalyser.fftSize = 256;
+    const src = pbAudioCtx.createMediaStreamSource(stream);
+    src.connect(pbAnalyser);
+    pbDrawWave();
+
+    // Legjobb supported mimeType
+    const mimeTypes=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];
+    let mimeType = '';
+    for(const m of mimeTypes){ if(MediaRecorder.isTypeSupported(m)){ mimeType=m; break; } }
+
+    pbAudioChunks=[];
+    pbMediaRecorder = new MediaRecorder(stream, mimeType?{mimeType}:{});
+    pbMediaRecorder.ondataavailable = e=>{ if(e.data.size>0) pbAudioChunks.push(e.data); };
+    pbMediaRecorder.onstop = pbOnRecordingStop;
+    pbMediaRecorder.start(250); // 250ms chunks
+
+    pbRecording=true;
+    const btn=document.getElementById('pb-mic-btn');
+    btn.classList.add('recording');
+    document.getElementById('pb-mic-label').textContent='Leállítás (felvétel folyik…)';
+    document.getElementById('pb-wave-wrap').style.display='block';
+    document.getElementById('pb-wave-label').textContent='Hallgatom…';
+    document.getElementById('pb-transcript-box').style.display='none';
+    document.getElementById('pb-answers').style.display='none';
+    document.getElementById('pb-loading').style.display='none';
+
+  }catch(e){
+    if(e.name==='NotAllowedError'||e.name==='PermissionDeniedError'){
+      toast('Mikrofon engedély szükséges! Böngésző beállításokban engedélyezd.','error','ti-microphone-off');
+    } else if(e.name==='NotFoundError'){
+      toast('Nem található mikrofon az eszközön!','error','ti-microphone-off');
+    } else if(e.name==='NotSupportedError'||e.name==='SecurityError'){
+      toast('Mikrofon csak HTTPS-en működik! Nyisd meg biztonságos kapcsolaton.','error','ti-alert-circle');
+    } else {
+      toast('Hiba: '+e.message,'error','ti-alert-circle');
+    }
+  }
+}
+
+function pbStopMic(){
+  if(pbMediaRecorder&&pbMediaRecorder.state!=='inactive') pbMediaRecorder.stop();
+  if(pbMicStream) pbMicStream.getTracks().forEach(t=>t.stop());
+  if(pbWaveRAF){ cancelAnimationFrame(pbWaveRAF); pbWaveRAF=null; }
+  if(pbAudioCtx){ pbAudioCtx.close(); pbAudioCtx=null; }
+  pbRecording=false;
+  const btn=document.getElementById('pb-mic-btn');
+  btn.classList.remove('recording');
+  document.getElementById('pb-mic-label').textContent='Mikrofon indítása';
+  document.getElementById('pb-wave-label').textContent='Átírás folyamatban…';
+}
+
+async function pbOnRecordingStop(){
+  const mimeType = pbAudioChunks[0]?.type || 'audio/webm';
+  const rawBlob = new Blob(pbAudioChunks, {type: mimeType});
+  pbAudioChunks=[];
+
+  if(rawBlob.size < 1000){
+    document.getElementById('pb-wave-wrap').style.display='none';
+    toast('Túl rövid a felvétel, próbáld újra!','error','ti-alert-circle');
+    return;
+  }
+
+  document.getElementById('pb-wave-wrap').style.display='none';
+  document.getElementById('pb-loading').style.display='flex';
+  document.getElementById('pb-loading').querySelector('span').textContent='Hangfeldolgozás…';
+
+  try{
+    // 16kHz mono WAV konvertálás AudioContext segítségével
+    // A Whisper 16kHz mono-ra optimalizált — ez a legfontosabb pontosítás
+    let wavBlob;
+    try{
+      wavBlob = await pbConvertToWav(rawBlob);
+    }catch(convErr){
+      // Ha a konverzió nem sikerül, az eredeti blobbal folytatjuk
+      console.warn('WAV konverzió sikertelen, eredeti formátum küldése:', convErr);
+      wavBlob = rawBlob;
+    }
+
+    document.getElementById('pb-loading').querySelector('span').textContent='Hangfelismerés…';
+
+    const ext = wavBlob.type.includes('wav') ? 'wav'
+              : mimeType.includes('mp4')  ? 'mp4'
+              : mimeType.includes('ogg')  ? 'ogg' : 'webm';
+
+    const formData = new FormData();
+    formData.append('file', wavBlob, 'audio.'+ext);
+    // whisper-large-v3 pontosabb mint a turbo, különösen nem-angol nyelveknél
+    formData.append('model','whisper-large-v3');
+    formData.append('language','hu');
+    // verbose_json: no_speech_prob mezőből ellenőrizhetjük a bizonyosságot
+    formData.append('response_format','verbose_json');
+    // temperature=0: determinisztikus, nem "hallucinálja" a szavakat
+    formData.append('temperature','0');
+    // prompt: kontextus segíti a modellt a magyar kifejezésekhez
+    formData.append('prompt','Ez egy magyar nyelvű kérdés vagy kérés. A felhasználó segítséget kér, véleményt mond, vagy kommunikál valakivel. Hétköznapi, természetes magyar mondat.');
+
+    const sttRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+groqKey},
+      body: formData
+    });
+    if(!sttRes.ok){
+      const err=await sttRes.json().catch(()=>({}));
+      throw new Error(err.error?.message||'Whisper hiba: '+sttRes.status);
+    }
+    const sttData=await sttRes.json();
+
+    // no_speech_prob > 0.6 → valószínűleg nem volt hallható hang
+    const segments = sttData.segments || [];
+    const avgNoSpeech = segments.length
+      ? segments.reduce((s,seg)=>s+(seg.no_speech_prob||0),0)/segments.length
+      : 0;
+
+    pbTranscript=(sttData.text||'').trim();
+
+    if(!pbTranscript || avgNoSpeech > 0.65){
+      document.getElementById('pb-loading').style.display='none';
+      toast('Nem sikerült felismerni a hangot – beszélj hangosabban, vagy próbáld újra!','error','ti-microphone-off');
+      return;
+    }
+
+    // Alacsony bizonyosság figyelmeztetés (0.4–0.65 között)
+    const lowConf = avgNoSpeech > 0.4;
+    document.getElementById('pb-transcript-text').textContent = pbTranscript;
+    document.getElementById('pb-transcript-box').style.display = 'block';
+    document.getElementById('pb-loading').style.display = 'none';
+    toast(
+      lowConf ? 'Felismerve (ellenőrizd a szöveget!)' : 'Hang felismerve!',
+      'success','ti-check'
+    );
+
+  }catch(e){
+    document.getElementById('pb-loading').style.display='none';
+    toast(e.message||'Felismerési hiba','error','ti-alert-circle');
+  }
+}
+
+// WebM/OGG → 16kHz mono WAV konvertálás AudioContext-en keresztül
+// A Whisper model erre van optimalizálva → jobb pontosság
+async function pbConvertToWav(blob){
+  const arrayBuf = await blob.arrayBuffer();
+  const tmpCtx = new AudioContext();
+  const decoded = await tmpCtx.decodeAudioData(arrayBuf);
+  tmpCtx.close();
+
+  const TARGET_SR = 16000;
+  const channels = 1; // mono
+  const offlineCtx = new OfflineAudioContext(channels, Math.ceil(decoded.duration * TARGET_SR), TARGET_SR);
+  const src = offlineCtx.createBufferSource();
+  src.buffer = decoded;
+  src.connect(offlineCtx.destination);
+  src.start(0);
+  const rendered = await offlineCtx.startRendering();
+
+  // PCM Int16 WAV elkészítése
+  const pcmData = rendered.getChannelData(0);
+  const int16 = new Int16Array(pcmData.length);
+  for(let i=0;i<pcmData.length;i++){
+    const s = Math.max(-1,Math.min(1,pcmData[i]));
+    int16[i] = s < 0 ? s*0x8000 : s*0x7FFF;
+  }
+  const wavBuf = pbMakeWavBuffer(int16, TARGET_SR);
+  return new Blob([wavBuf], {type:'audio/wav'});
+}
+
+function pbMakeWavBuffer(int16Data, sampleRate){
+  const len = int16Data.length;
+  const buf = new ArrayBuffer(44 + len*2);
+  const view = new DataView(buf);
+  const writeStr=(o,s)=>{for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i));};
+  writeStr(0,'RIFF');
+  view.setUint32(4, 36+len*2, true);
+  writeStr(8,'WAVE');
+  writeStr(12,'fmt ');
+  view.setUint32(16,16,true);      // chunk size
+  view.setUint16(20,1,true);       // PCM
+  view.setUint16(22,1,true);       // mono
+  view.setUint32(24,sampleRate,true);
+  view.setUint32(28,sampleRate*2,true); // byte rate
+  view.setUint16(32,2,true);       // block align
+  view.setUint16(34,16,true);      // bits per sample
+  writeStr(36,'data');
+  view.setUint32(40,len*2,true);
+  const pcmView = new Int16Array(buf,44);
+  pcmView.set(int16Data);
+  return buf;
+}
+
+function pbDrawWave(){
+  const canvas=document.getElementById('pb-wave-canvas');
+  if(!canvas||!pbAnalyser){ return; }
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width=canvas.offsetWidth;
+  const H=canvas.height=64;
+  const bufLen=pbAnalyser.frequencyBinCount;
+  const dataArr=new Uint8Array(bufLen);
+
+  function draw(){
+    pbWaveRAF=requestAnimationFrame(draw);
+    pbAnalyser.getByteTimeDomainData(dataArr);
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0f172a';
+    ctx.fillRect(0,0,W,H);
+    ctx.lineWidth=2.5;
+    ctx.strokeStyle='#ef4444';
+    ctx.shadowColor='#ef4444';
+    ctx.shadowBlur=8;
+    ctx.beginPath();
+    const sliceW=W/bufLen;
+    let x=0;
+    for(let i=0;i<bufLen;i++){
+      const v=dataArr[i]/128;
+      const y=(v*H)/2;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      x+=sliceW;
+    }
+    ctx.lineTo(W,H/2);
+    ctx.stroke();
+  }
+  draw();
+}
+
+async function pbGenerate(){
+  if(!pbTranscript){ toast('Először rögzíts egy kérdést!','error','ti-alert-circle'); return; }
+  if(!groqKey){ toast('Add meg a Groq API kulcsot!','error','ti-settings'); openSettings(); return; }
+
+  const btn=document.getElementById('pb-gen-btn');
+  btn.disabled=true;
+  document.getElementById('pb-answers').style.display='none';
+  document.getElementById('pb-loading').style.display='flex';
+  document.getElementById('pb-loading').querySelector('span').textContent='Válaszok generálása…';
+
+  try{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:500,
+        temperature:0.7,
+        messages:[{
+          role:'system',
+          content:'Te egy AAC (Augmentative and Alternative Communication) segédprogram vagy. Néma vagy súlyosan beszédkorlátozott embereknek generálsz válaszokat. MINDIG CSAK a kért formátumban válaszolj, semmi más szöveg nélkül.'
+        },{
+          role:'user',
+          content:`A kommunikációs partner ezt mondta/kérdezte: "${pbTranscript}"
+
+Generálj pontosan 6 természetes MAGYAR mondatot – 3 igenleges (beleegyező, megerősítő, pozitív) és 3 nemleges (tagadó, elutasító, negatív) – amelyekkel a korlátozott személy válaszolhat.
+
+Szabályok:
+- Maximum 12 szó mondatonként
+- Változatos, árnyalt kifejezések (ne csak "igen/nem")
+- Természetes, hétköznapi magyar
+
+Válasz PONTOSAN ilyen formában (semmi más):
+IGEN:
+mondat1
+mondat2
+mondat3
+NEM:
+mondat4
+mondat5
+mondat6`
+        }]
+      })
+    });
+
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error?.message||'Groq API hiba: '+res.status);
+    }
+
+    const data=await res.json();
+    const raw=(data.choices?.[0]?.message?.content||'').trim();
+
+    const igenMatch=raw.match(/IGEN:\s*([\s\S]*?)(?=NEM:|$)/i);
+    const nemMatch=raw.match(/NEM:\s*([\s\S]*?)$/i);
+
+    const parseLines=(block)=>(block||'').split('\n')
+      .map(s=>s.replace(/^\d+[\.\)\-\s]*/,'').trim())
+      .filter(s=>s.length>2&&s.length<200)
+      .slice(0,3);
+
+    const igen=parseLines(igenMatch?.[1]||'');
+    const nem=parseLines(nemMatch?.[1]||'');
+
+    if(!igen.length&&!nem.length) throw new Error('Üres válasz – próbáld újra!');
+
+    for(let i=0;i<3;i++){
+      document.getElementById('pb-yes-text-'+i).value=igen[i]||'';
+      document.getElementById('pb-no-text-'+i).value=nem[i]||'';
+    }
+
+    document.getElementById('pb-loading').style.display='none';
+    document.getElementById('pb-answers').style.display='grid';
+    toast('Válaszok készen!','success','ti-check');
+
+  }catch(e){
+    document.getElementById('pb-loading').style.display='none';
+    toast(e.message||'Hiba történt','error','ti-alert-circle');
+  }
+  btn.disabled=false;
+}
+
+function pbSpeak(textareaId){
+  const text=document.getElementById(textareaId).value.trim();
+  if(!text){ toast('Nincs szöveg!','error','ti-alert-circle'); return; }
+  speakText(text);
+}
+
+function pbReset(){
+  pbTranscript='';
+  document.getElementById('pb-transcript-box').style.display='none';
+  document.getElementById('pb-answers').style.display='none';
+  document.getElementById('pb-loading').style.display='none';
+  document.getElementById('pb-wave-wrap').style.display='none';
+  document.getElementById('pb-mic-label').textContent='Mikrofon indítása';
+  document.getElementById('pb-mic-btn').classList.remove('recording');
+}
+
+init();
+</script>
+
+<!-- INFO MODAL -->
+<style>
+  .info-feature-icon {
+    width: 54px; height: 54px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .info-h3 {
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 16px;
+    color: var(--text); margin-bottom: 7px;
+  }
+  .info-p {
+    font-size: 13px; color: var(--text2); font-weight: 600;
+    line-height: 1.75; margin-bottom: 4px;
+  }
+  .info-divider { height: 1px; background: var(--surface2); margin: 14px 0; }
+  .info-panel { padding-bottom: 4px; }
+</style>
+
+<div class="modal-bg" id="info-modal" onclick="if(event.target===this)closeInfo()">
+  <div class="modal" style="max-height:90vh;">
+    <div class="modal-handle"></div>
+    <h2 style="margin-bottom:12px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      Hangom – Súgó
+    </h2>
+    <p class="modal-desc">Az alkalmazás hangjukat elvesztett személyeknek nyújt gyors, AI-alapú kommunikációs segítséget.</p>
+
+    <div class="stab-bar" style="overflow-x:auto;flex-wrap:nowrap;">
+      <button class="stab active" id="itab-home" onclick="switchInfoTab('home')" style="white-space:nowrap;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        Főoldal
+      </button>
+      <button class="stab" id="itab-saved" onclick="switchInfoTab('saved')" style="white-space:nowrap;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        Mentett
+      </button>
+      <button class="stab" id="itab-gen" onclick="switchInfoTab('gen')" style="white-space:nowrap;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5z"/></svg>
+        Generálás
+      </button>
+      <button class="stab" id="itab-write" onclick="switchInfoTab('write')" style="white-space:nowrap;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Írás
+      </button>
+      <button class="stab" id="itab-dialog" onclick="switchInfoTab('dialog')" style="white-space:nowrap;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Párbeszéd
+      </button>
+    </div>
+
+    <div class="info-panel" id="ipanel-home">
+      <div class="info-feature-icon" style="background:var(--accent-light);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>
+      </div>
+      <h3 class="info-h3">Gépelés &amp; Azonnali felolvasás</h3>
+      <p class="info-p">A főoldalon szabadon begépelhetsz bármilyen szöveget. A <strong>Felolvasás</strong> gomb megnyomásával a program azonnal hangosan felolvassa. A mentés gombbal egyből a mentett mondatok közé kerül.</p>
+      <div class="info-divider"></div>
+      <h3 class="info-h3">Gyors mondatok</h3>
+      <p class="info-p">Az oldal alsó részén előre beírt gyors mondatok találhatók kártyák formájában – egyetlen érintéssel felolvastatható. A <strong>Szerkesztés</strong> gombbal bármely kártyát testre szabhatod (köszönés, kérések, válaszok, stb.).</p>
+    </div>
+
+    <div class="info-panel" id="ipanel-saved" style="display:none">
+      <div class="info-feature-icon" style="background:var(--accent2-light);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h3 class="info-h3">Mentett mondatok</h3>
+      <p class="info-p">Ide gyűjtöd az összes fontos, előre megírt mondatot: bemutatkozás, orvosi tünetek, ügyintézési információk. Szöveg alapján kereshetsz közöttük, szerkesztheted vagy törölheted őket, és azonnal felolvastathatsz bármelyiket.</p>
+    </div>
+
+    <div class="info-panel" id="ipanel-gen" style="display:none">
+      <div class="info-feature-icon" style="background:var(--accent3-light);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5z"/></svg>
+      </div>
+      <h3 class="info-h3">AI mondatgenerálás</h3>
+      <p class="info-p">Írj be 2–4 kulcsszót (pl. „orvos, fájdalom, segítség"), és az AI azonnal teljes, értelmes magyar mondatokat generál belőlük – ragozás és nyelvtan nélkül. A generált mondatokat felolvastathatod vagy elmentheted. Groq API kulcs és internet szükséges.</p>
+    </div>
+
+    <div class="info-panel" id="ipanel-write" style="display:none">
+      <div class="info-feature-icon" style="background:#ede9fe;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <h3 class="info-h3">Kézírásos bevitel</h3>
+      <p class="info-p">Ha a gépelés nehezedre esik, ujjal vagy ceruzával írhatsz a vászonra. A program AI segítségével felismeri a kézírást és szöveggé alakítja. A felismert szöveget felolvastathatod, a gépelő mezőbe küldheted, vagy elmentheted.</p>
+    </div>
+
+    <div class="info-panel" id="ipanel-dialog" style="display:none">
+      <div class="info-feature-icon" style="background:var(--accent-light);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h3 class="info-h3">Intelligens párbeszéd</h3>
+      <p class="info-p">Indítsd el a mikrofont és tedd le a telefont magad mellé. A program érzékeli a kérdező hangját (orvos, hozzátartozó), felismeri a kérdést, majd az AI automatikusan generál <strong>3 igenleges és 3 nemleges választ</strong>. Kiválasztod a legmegfelelőbbet és egy gombnyomással felolvastatod – gépelés nélkül.</p>
+    </div>
+
+    <button class="save-settings" onclick="closeInfo()" style="margin-top:18px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Bezárás
+    </button>
+  </div>
+</div>
+
+<script>
+function openInfo(){
+  document.getElementById('info-modal').classList.add('open');
+  switchInfoTab('home');
+}
+function closeInfo(){
+  document.getElementById('info-modal').classList.remove('open');
+}
+function switchInfoTab(tab){
+  ['home','saved','gen','write','dialog'].forEach(function(t){
+    document.getElementById('ipanel-'+t).style.display = t===tab ? 'block' : 'none';
+    var btn = document.getElementById('itab-'+t);
+    if(btn){ btn.classList.toggle('active', t===tab); }
+  });
+}
+</script>
+
+</body>
+</html>
