@@ -439,6 +439,14 @@
   .hw-btn-clear:active { background: var(--danger-light); color: var(--danger); }
   .hw-btn-recog { background: #7c3aed; color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,0.3); }
   .hw-btn-recog:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; pointer-events: none; }
+  .hw-eraser-btn {
+    background: var(--surface2); border: none; border-radius: 10px; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px;
+    color: var(--text2); padding: 6px 10px; transition: all 0.15s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .hw-eraser-btn.active { background: #fef3c7; color: #d97706; border: 2px solid #d97706; }
+  .hw-eraser-row { display: flex; gap: 6px; align-items: center; }
   .hw-result {
     background: var(--surface); border: 2px solid var(--surface2);
     border-radius: var(--radius-sm); padding: 12px 14px; flex-shrink: 0;
@@ -448,7 +456,11 @@
   .hw-result-text {
     flex: 1; font-family: 'Nunito', sans-serif; font-weight: 700;
     font-size: 17px; color: var(--text); line-height: 1.4;
+    background: transparent; border: none; outline: none; resize: none;
+    min-height: 28px; width: 100%; padding: 0;
+    border-bottom: 1.5px dashed #cbd5e1; transition: border-color 0.2s;
   }
+  .hw-result-text:focus { border-bottom-color: var(--accent); }
   .hw-result-btn {
     width: 44px; height: 44px; border-radius: 12px; border: none; font-size: 20px;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -830,6 +842,12 @@
               <div class="hw-color active" style="background:#0f172a" data-color="#0f172a" onclick="setHwColor(this)"></div>
               <div class="hw-color" style="background:#2563eb" data-color="#2563eb" onclick="setHwColor(this)"></div>
             </div>
+            <div class="hw-eraser-row">
+              <button class="hw-eraser-btn" id="hw-eraser-btn" onclick="toggleHwEraser()" title="Radír">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16l10-10 7 7-2.5 2.5"/><path d="M6.0001 10l4 4"/></svg>
+                Radír
+              </button>
+            </div>
             <div class="hw-size-row">
               <button class="hw-size-btn" data-size="2" onclick="setHwSize(this)">S</button>
               <button class="hw-size-btn active" data-size="4" onclick="setHwSize(this)">M</button>
@@ -841,7 +859,7 @@
             <button class="hw-btn hw-btn-recog" id="hw-recog-btn" onclick="hwRecognize()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg> Felismerés</button>
           </div>
           <div class="hw-result" id="hw-result">
-            <div class="hw-result-text" id="hw-result-text"></div>
+            <textarea class="hw-result-text" id="hw-result-text" rows="1" placeholder="Felismert szöveg…" oninput="hwAutoResize(this)"></textarea>
             <button class="hw-result-btn hw-rb-speak" title="Felolvasás" onclick="hwSpeak()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
             <button class="hw-result-btn hw-rb-send" title="Küldés a gépelő mezőbe" onclick="hwSendToTyped()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
             <button class="hw-result-btn hw-rb-save" title="Mentés" onclick="hwSave()"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg></button>
@@ -1456,6 +1474,7 @@ function deleteQEdit(){
 /* ── KÉZÍRÁS FELISMERÉS ── */
 let hwCanvas, hwCtx, hwDrawing=false, hwHasContent=false;
 let hwColor='#0f172a', hwSize=4, hwLastX=0, hwLastY=0;
+let hwEraserMode=false, hwEraserSize=24;
 
 function initHwCanvas(){
   hwCanvas=document.getElementById('hw-canvas');
@@ -1491,13 +1510,20 @@ function hwStart(e){
   hwDrawing=true;
   const pos=hwGetPos(e);
   hwLastX=pos.x; hwLastY=pos.y;
-  hwCtx.beginPath();
-  hwCtx.arc(pos.x,pos.y,hwSize/2,0,Math.PI*2);
-  hwCtx.fillStyle=hwColor;
-  hwCtx.fill();
-  if(!hwHasContent){
-    hwHasContent=true;
-    document.getElementById('hw-placeholder').style.display='none';
+  if(hwEraserMode){
+    hwCtx.beginPath();
+    hwCtx.arc(pos.x,pos.y,hwEraserSize/2,0,Math.PI*2);
+    hwCtx.fillStyle='#ffffff';
+    hwCtx.fill();
+  } else {
+    hwCtx.beginPath();
+    hwCtx.arc(pos.x,pos.y,hwSize/2,0,Math.PI*2);
+    hwCtx.fillStyle=hwColor;
+    hwCtx.fill();
+    if(!hwHasContent){
+      hwHasContent=true;
+      document.getElementById('hw-placeholder').style.display='none';
+    }
   }
 }
 
@@ -1505,12 +1531,29 @@ function hwMove(e){
   e.preventDefault();
   if(!hwDrawing) return;
   const pos=hwGetPos(e);
-  hwCtx.beginPath();
-  hwCtx.strokeStyle=hwColor;
-  hwCtx.lineWidth=hwSize;
-  hwCtx.moveTo(hwLastX,hwLastY);
-  hwCtx.lineTo(pos.x,pos.y);
-  hwCtx.stroke();
+  if(hwEraserMode){
+    // Radír: fehér kör húzása a mozgás mentén
+    hwCtx.beginPath();
+    hwCtx.arc(pos.x,pos.y,hwEraserSize/2,0,Math.PI*2);
+    hwCtx.fillStyle='#ffffff';
+    hwCtx.fill();
+    // Összekötés az előző ponttal is (folyamatos törlés)
+    hwCtx.beginPath();
+    hwCtx.strokeStyle='#ffffff';
+    hwCtx.lineWidth=hwEraserSize;
+    hwCtx.lineCap='round';
+    hwCtx.moveTo(hwLastX,hwLastY);
+    hwCtx.lineTo(pos.x,pos.y);
+    hwCtx.stroke();
+  } else {
+    hwCtx.beginPath();
+    hwCtx.strokeStyle=hwColor;
+    hwCtx.lineWidth=hwSize;
+    hwCtx.lineCap='round';
+    hwCtx.moveTo(hwLastX,hwLastY);
+    hwCtx.lineTo(pos.x,pos.y);
+    hwCtx.stroke();
+  }
   hwLastX=pos.x; hwLastY=pos.y;
 }
 
@@ -1521,18 +1564,45 @@ function hwClear(){
   hwCtx.fillStyle='#ffffff';
   hwCtx.fillRect(0,0,hwCanvas.width,hwCanvas.height);
   hwHasContent=false;
+  hwEraserMode=false;
   document.getElementById('hw-placeholder').style.display='flex';
   document.getElementById('hw-result').classList.remove('visible');
+  document.getElementById('hw-canvas').style.cursor='crosshair';
+  const eb=document.getElementById('hw-eraser-btn');
+  if(eb) eb.classList.remove('active');
+  document.querySelectorAll('.hw-color').forEach(c=>{ if(c.dataset.color===hwColor) c.classList.add('active'); });
 }
 
 function setHwColor(el){
   hwColor=el.dataset.color;
   document.querySelectorAll('.hw-color').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
+  // Szín választásakor radír kikapcsol
+  if(hwEraserMode){ hwEraserMode=false; document.getElementById('hw-canvas').style.cursor='crosshair'; document.getElementById('hw-eraser-btn').classList.remove('active'); }
+}
+
+function toggleHwEraser(){
+  hwEraserMode=!hwEraserMode;
+  const btn=document.getElementById('hw-eraser-btn');
+  const canvas=document.getElementById('hw-canvas');
+  if(hwEraserMode){
+    btn.classList.add('active');
+    canvas.style.cursor='cell';
+    // Szín kijelölés törlése vizuálisan
+    document.querySelectorAll('.hw-color').forEach(c=>c.classList.remove('active'));
+  } else {
+    btn.classList.remove('active');
+    canvas.style.cursor='crosshair';
+    // Visszaállítjuk az aktív színt
+    document.querySelectorAll('.hw-color').forEach(c=>{ if(c.dataset.color===hwColor) c.classList.add('active'); });
+  }
 }
 
 function setHwSize(el){
-  hwSize=parseInt(el.dataset.size);
+  const sz=parseInt(el.dataset.size);
+  hwSize=sz;
+  // Radír mérete arányosan nagyobb mint az írásmód
+  hwEraserSize = sz===2 ? 18 : sz===4 ? 28 : 44;
   document.querySelectorAll('.hw-size-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
 }
@@ -1577,27 +1647,18 @@ async function hwRecognize(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'meta-llama/llama-4-scout-17b-16e-instruct',
-        max_tokens:300,
-        temperature:0.1,
+        max_tokens:120,
+        temperature:0.0,
         messages:[
           {
             role:'system',
-            content:'Te egy precíz OCR rendszer vagy. Feladatod kézírott szöveg pontos átírása. Mindig CSAK a látható szöveget add vissza, semmi mást.'
+            content:'You are an OCR system. Your ONLY job: read the handwritten text in the image and output EXACTLY that text, nothing else. No explanations, no comments, no code, no markup. If nothing is written, output the single word EMPTY.'
           },
           {
             role:'user',
             content:[
               {type:'image_url', image_url:{url:'data:image/png;base64,'+base64, detail:'high'}},
-              {type:'text', text:`Ez egy kézírás-felismerő alkalmazás vásznáról készült kép. A felhasználó ujjával vagy tollal írt rá szöveget fehér alapon fekete tintával.
-
-FELADATOD: Olvasd el a kézzel írt szöveget és írd át pontosan.
-
-SZABÁLYOK:
-1. CSAK a felismert szöveget add vissza – semmi magyarázat, kommentár, idézőjel
-2. Tartsd meg az eredeti sortöréseket
-3. Ha bizonytalan egy betű, a kontextus alapján válaszd a legvalószínűbbet
-4. Magyar szövegnél tartsd meg az ékezeteket: á é í ó ö ő ú ü ű
-5. Ha semmi nem olvasható: [nem olvasható]`}
+              {type:'text', text:'What Hungarian text is written in this image? Output ONLY the exact handwritten text. Preserve accents (a e i o o o u u u with accents). Nothing else.'}
             ]
           }
         ]
@@ -1610,11 +1671,18 @@ SZABÁLYOK:
     }
 
     const data=await res.json();
-    const text=(data.choices?.[0]?.message?.content||'').trim();
-    if(!text||text==='[nem olvasható]'){
-      toast('Nem sikerült felismerni – próbálj nagyobb, tisztább betűket!','error','ti-alert-circle');
+    let text=(data.choices?.[0]?.message?.content||'').trim();
+
+    // Hallucináció szűrő: ha túl sok nem latin/magyar karakter jön vissza → szemet dob ki
+    const nonLatinCount=(text.match(/[^\u0000-\u024F\s\.,!?;:\-\'"/()\[\]]/g)||[]).length;
+    const nonLatinRatio=text.length>0?nonLatinCount/text.length:0;
+    const isGarbage=nonLatinRatio>0.15||text.length>200;
+
+    if(!text||text==='EMPTY'||isGarbage){
+      toast('Nem sikerült felismerni – próbálj nagyobb, tiszta bb betűket!','error','ti-alert-circle');
     } else {
-      document.getElementById('hw-result-text').textContent=text;
+      document.getElementById('hw-result-text').value=text;
+      hwAutoResize(document.getElementById('hw-result-text'));
       document.getElementById('hw-result').classList.add('visible');
       toast('Szöveg felismerve!','success','ti-scan');
     }
@@ -1626,13 +1694,18 @@ SZABÁLYOK:
   btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg> Felismerés';
 }
 
+function hwAutoResize(el){
+  el.style.height='auto';
+  el.style.height=el.scrollHeight+'px';
+}
+
 function hwSpeak(){
-  const text=document.getElementById('hw-result-text').textContent;
+  const text=document.getElementById('hw-result-text').value;
   if(text) speakText(text);
 }
 
 function hwSendToTyped(){
-  const text=document.getElementById('hw-result-text').textContent;
+  const text=document.getElementById('hw-result-text').value;
   if(!text) return;
   document.getElementById('typed-input').value=text;
   updateCounter();
@@ -1641,7 +1714,7 @@ function hwSendToTyped(){
 }
 
 function hwSave(){
-  const text=document.getElementById('hw-result-text').textContent;
+  const text=document.getElementById('hw-result-text').value;
   if(!text) return;
   if(savedPhrases.includes(text)){toast('Már el van mentve!','','ti-info-circle');return;}
   savedPhrases.unshift(text); persistSaved(); renderSaved();
