@@ -792,7 +792,7 @@
         <div class="saved-top">
           <div class="search-box">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="search-input" placeholder="Keresés a mondatok között…" oninput="filterSaved(this.value)">
+            <input type="text" id="search-input" placeholder="Keresés a mondatok között…" oninput="filterSaved(this.value)" autocomplete="off">
           </div>
         </div>
         <div class="saved-list" id="saved-list"></div>
@@ -976,14 +976,21 @@
             class="preset-voice-btn">
             🎙 2. hang
           </button>
+          <button data-preset="2" onclick="switchPresetVoice(2)"
+            style="flex:1;padding:13px;border:2.5px solid var(--surface2);border-radius:var(--radius-sm);
+            background:var(--surface);font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;
+            color:var(--text2);cursor:pointer;transition:all 0.18s;"
+            class="preset-voice-btn">
+            🎙 3. hang
+          </button>
         </div>
-        <div class="field-hint">Váltás azonnal érvényes. Az aktív gomb kék kerettel jelölt.</div>
+        <div class="field-hint">Ha egy hang tokenje kimerül, a rendszer automatikusan átlép a következőre. Az aktív gomb kék kerettel jelölt.</div>
       </div>
 
       <!-- ElevenLabs API kulcs (mindkét módhoz kell) -->
       <div class="field">
         <label>ElevenLabs API kulcs</label>
-        <input type="password" id="api-key-input" placeholder="sk_…">
+        <input type="text" id="api-key-input" placeholder="sk_…" autocomplete="off" data-lpignore="true" data-form-type="other" readonly onfocus="this.removeAttribute('readonly')">
         <div class="field-hint">Szükséges minden hanghoz. Létrehozás: <a href="https://elevenlabs.io/app/home" target="_blank">elevenlabs.io</a> → bal felső menü → ElevenAPI → API Keys</div>
       </div>
 
@@ -1004,11 +1011,11 @@
 
       <div class="field" style="margin-top:4px">
         <label>Személyes hang kód (Voice ID)</label>
-        <input type="text" id="voice-id-input" placeholder="pl: 21m00Tcm4TlvDq8ikWAM">
+        <input type="text" id="voice-id-input" placeholder="pl: 21m00Tcm4TlvDq8ikWAM" autocomplete="off" data-lpignore="true" data-form-type="other">
       </div>
       <div class="field">
         <label>Modell (opcionális)</label>
-        <input type="text" id="model-id-input" placeholder="eleven_turbo_v2_5">
+        <input type="text" id="model-id-input" placeholder="eleven_turbo_v2_5" autocomplete="off" data-lpignore="true" data-form-type="other">
       </div>
 
       <button class="save-settings" onclick="saveCustomVoice()">
@@ -1037,7 +1044,7 @@
       </div>
       <div class="field">
         <label>Groq API kulcs</label>
-        <input type="password" id="groq-key-input" placeholder="gsk_…">
+        <input type="text" id="groq-key-input" placeholder="gsk_…" autocomplete="off" data-lpignore="true" data-form-type="other" readonly onfocus="this.removeAttribute('readonly')">
       </div>
       <button class="save-settings" onclick="saveGroqKey()">
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -1076,6 +1083,87 @@
 
 <script>
 let apiKey='', voiceId='', modelId='eleven_turbo_v2_5', groqKey='';
+
+const GROQ_KEYS = [
+  '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',
+  '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',
+  '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'
+];
+let activeGroqKeyIdx = 0;
+const DEFAULT_GROQ_KEY = GROQ_KEYS[0];
+
+// Groq API hívás automatikus kulcs-fallback-kal
+async function groqFetch(url, options){
+  let lastErr = null;
+  for(let t=0; t<GROQ_KEYS.length; t++){
+    const idx = (activeGroqKeyIdx + t) % GROQ_KEYS.length;
+    const key = GROQ_KEYS[idx];
+    const hdrs = Object.assign({}, options.headers||{}, {'Authorization':'Bearer '+key});
+    const opts = Object.assign({}, options, {headers: hdrs});
+    try{
+      const res = await fetch(url, opts);
+      if(!res.ok){
+        let isInvalid = false;
+        try{
+          const j = await res.json();
+          const msg = (j.error?.message||'').toLowerCase();
+          lastErr = new Error(j.error?.message||'Groq API hiba: '+res.status);
+          if(res.status===401||res.status===403||res.status===429||msg.includes('invalid')||msg.includes('quota')||msg.includes('rate')){
+            isInvalid = true;
+          }
+        }catch(_){ lastErr = new Error('Groq API hiba: '+res.status); isInvalid=true; }
+        if(isInvalid && t < GROQ_KEYS.length-1){
+          activeGroqKeyIdx = (activeGroqKeyIdx+t+1) % GROQ_KEYS.length;
+          groqKey = GROQ_KEYS[activeGroqKeyIdx];
+          continue;
+        }
+        throw lastErr;
+      }
+      if(t>0){ activeGroqKeyIdx=idx; groqKey=key; }
+      return res;
+    }catch(e){
+      // Hálózati hiba (nem API hiba) → azonnal dobja, nincs értelme más kulccsal próbálni
+      if(e instanceof TypeError && e.message.toLowerCase().includes('fetch')){ throw e; }
+      if(t===GROQ_KEYS.length-1) throw e;
+      lastErr=e;
+    }
+  }
+  throw lastErr||new Error('Minden Groq kulcs érvénytelen');
+}
+
+/* ── SETTINGS ── */
+// Beépített hangok
+const BUILTIN_VOICES = [
+  { name:'Sára',    age:'24 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+  { name:'Bence',   age:'27 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+  { name:'Katalin', age:'46 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+  { name:'László',  age:'51 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
+];
+
+// ── ELŐRE BEÁLLÍTOTT 3 SZEMÉLYES HANG (automatikus fallback lánc) ──
+const PRESET_VOICES = [
+  {
+    label: '1. hang',
+    apiKey: '7bfcba4d8d85727352d561b553a3f48c3fe1d639b4da4702ec2f2ae002cdeb19',
+    voiceId: '5VVTDYOFYrMSZ6wdZYjJ',
+    modelId: 'eleven_turbo_v2_5'
+  },
+  {
+    label: '2. hang',
+    apiKey: 'c3d0f23fda7e0ac0687270989352e94eed735592d16855905a906026ea0d64e2',
+    voiceId: 'k3magzxSaDMTHu6FBz7c',
+    modelId: 'eleven_turbo_v2_5'
+  },
+  {
+    label: '3. hang',
+    apiKey: '7bfcba4d8d85727352d561b553a3f48c3fe1d639b4da4702ec2f2ae002cdeb19',
+    voiceId: 'W2jI4jvUDEiN9Rutb4yM',
+    modelId: 'eleven_turbo_v2_5'
+  }
+];
+let selectedVoiceType = 'custom'; // 'builtin-0'..'builtin-3' | 'custom'
+let activePresetVoice = 0; // 0 = 1. hang (alapértelmezett), 1 = 2. hang, 2 = 3. hang
+
 let currentAudio=null, isSpeaking=false, editingIdx=-1;
 let savedPhrases=[];
 
@@ -1088,9 +1176,9 @@ const DEFAULT_QUICK=[
 ];
 
 function init(){
-  // Preset hang betöltése (alapértelmezett: 2. hang = index 1)
-  activePresetVoice = parseInt(localStorage.getItem('active_preset_voice') ?? '1');
-  if(isNaN(activePresetVoice)||activePresetVoice<0||activePresetVoice>1) activePresetVoice=1;
+  // Preset hang betöltése (alapértelmezett: 1. hang = index 0)
+  activePresetVoice = parseInt(localStorage.getItem('active_preset_voice') ?? '0');
+  if(isNaN(activePresetVoice)||activePresetVoice<0||activePresetVoice>2) activePresetVoice=0;
   const pv = PRESET_VOICES[activePresetVoice];
   apiKey  = localStorage.getItem('el_api')   || pv.apiKey;
   voiceId = localStorage.getItem('el_voice') || pv.voiceId;
@@ -1157,34 +1245,91 @@ function clearTyped(){
   updateCounter();
 }
 
-/* ── SPEAK ── */
+/* ── SPEAK with automatic fallback ── */
+async function speakWithVoice(text, useApiKey, useVoiceId, useModelId){
+  const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`,{
+    method:'POST',
+    headers:{'xi-api-key':useApiKey,'Content-Type':'application/json','Accept':'audio/mpeg'},
+    body:JSON.stringify({
+      text, model_id:useModelId||'eleven_turbo_v2_5', language_code:'hu',
+      voice_settings:{stability:0.5,similarity_boost:0.85,style:0.2,use_speaker_boost:true}
+    })
+  });
+  if(!res.ok){
+    let msg='API hiba: '+res.status;
+    let isQuota=false;
+    try{
+      const j=await res.json();
+      msg=j.detail?.message||msg;
+      // quota/limit hibák: 429 vagy "quota" / "limit" szöveg
+      if(res.status===429||msg.toLowerCase().includes('quota')||msg.toLowerCase().includes('limit')||msg.toLowerCase().includes('insufficient')){
+        isQuota=true;
+      }
+    }catch(_){}
+    const err=new Error(msg);
+    err.isQuota=isQuota;
+    throw err;
+  }
+  const blob=await res.blob();
+  return blob;
+}
+
 async function speakText(text){
   if(!text||!text.trim()){ toast('Nincs szöveg!','error','ti-alert-circle'); return null; }
   if(!apiKey||!voiceId){ openSettings(); toast('Először add meg az API kulcsot!','error','ti-settings'); return null; }
   if(currentAudio){ currentAudio.pause(); currentAudio=null; }
-  try{
-    const res=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,{
-      method:'POST',
-      headers:{'xi-api-key':apiKey,'Content-Type':'application/json','Accept':'audio/mpeg'},
-      body:JSON.stringify({
-        text, model_id:modelId||'eleven_turbo_v2_5', language_code:'hu',
-        voice_settings:{stability:0.5,similarity_boost:0.85,style:0.2,use_speaker_boost:true}
-      })
-    });
-    if(!res.ok){
-      let msg='API hiba: '+res.status;
-      try{const j=await res.json(); msg=j.detail?.message||msg;}catch(_){}
-      throw new Error(msg);
+
+  // Ha a user saját egyéni kulcsot mentett, azt használjuk (nincs fallback)
+  const hasCustomKey = !!localStorage.getItem('el_api');
+  if(hasCustomKey){
+    try{
+      const blob = await speakWithVoice(text, apiKey, voiceId, modelId);
+      const audio = new Audio(URL.createObjectURL(blob));
+      currentAudio = audio;
+      audio.play();
+      return audio;
+    }catch(e){
+      toast(e.message||'Hiba történt','error','ti-alert-circle');
+      return null;
     }
-    const blob=await res.blob();
-    const audio=new Audio(URL.createObjectURL(blob));
-    currentAudio=audio;
-    audio.play();
-    return audio;
-  }catch(e){
-    toast(e.message||'Hiba történt','error','ti-alert-circle');
-    return null;
   }
+
+  // Preset módban: automatikus fallback a következő hangra quota/limit hiba esetén
+  let startIdx = activePresetVoice;
+  let tried = 0;
+  const maxTry = PRESET_VOICES.length;
+
+  while(tried < maxTry){
+    const idx = (startIdx + tried) % maxTry;
+    const pv = PRESET_VOICES[idx];
+    try{
+      const blob = await speakWithVoice(text, pv.apiKey, pv.voiceId, pv.modelId);
+      // Ha más hanggal sikerült, frissítjük az aktív hangot
+      if(tried > 0){
+        activePresetVoice = idx;
+        apiKey  = pv.apiKey;
+        voiceId = pv.voiceId;
+        modelId = pv.modelId;
+        localStorage.setItem('active_preset_voice', idx);
+        renderPresetVoiceToggle();
+        updateStatus();
+        toast(pv.label+' – automatikus váltás (token kimerült)','','ti-refresh');
+      }
+      const audio=new Audio(URL.createObjectURL(blob));
+      currentAudio=audio;
+      audio.play();
+      return audio;
+    }catch(e){
+      if(e.isQuota){
+        tried++;
+        continue;
+      }
+      toast(e.message||'Hiba történt','error','ti-alert-circle');
+      return null;
+    }
+  }
+  toast('Minden hang tokenje kimerült! Próbáld újra később.','error','ti-alert-circle');
+  return null;
 }
 
 async function speakTyped(){
@@ -1427,9 +1572,9 @@ async function hwRecognize(){
     const dataUrl=offCanvas.toDataURL('image/png');
     const base64=dataUrl.split(',')[1];
 
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    const res=await groqFetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'meta-llama/llama-4-scout-17b-16e-instruct',
         max_tokens:300,
@@ -1592,12 +1737,9 @@ async function generateSentences(){
   list.innerHTML=`<div class="empty-state"><svg class="spin" xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg><br>Mondatok generálása…</div>`;
 
   try{
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    const res=await groqFetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+groqKey
-      },
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'llama-3.3-70b-versatile',
         max_tokens:500,
@@ -1662,34 +1804,6 @@ function saveGenerated(text,btn){
   toast('Elmentve!','success','ti-bookmark-check');
 }
 
-/* ── SETTINGS ── */
-// Beépített hangok
-const BUILTIN_VOICES = [
-  { name:'Sára',    age:'24 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
-  { name:'Bence',   age:'27 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
-  { name:'Katalin', age:'46 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
-  { name:'László',  age:'51 éves', voiceId:'', modelId:'eleven_turbo_v2_5' },
-];
-
-// ── ELŐRE BEÁLLÍTOTT 2 SZEMÉLYES HANG ──
-const PRESET_VOICES = [
-  {
-    label: '1. hang',
-    apiKey: '7bfcba4d8d85727352d561b553a3f48c3fe1d639b4da4702ec2f2ae002cdeb19',
-    voiceId: 'W2jI4jvUDEiN9Rutb4yM',
-    modelId: 'eleven_turbo_v2_5'
-  },
-  {
-    label: '2. hang',
-    apiKey: 'c3d0f23fda7e0ac0687270989352e94eed735592d16855905a906026ea0d64e2',
-    voiceId: 'k3magzxSaDMTHu6FBz7c',
-    modelId: 'eleven_turbo_v2_5'
-  }
-];
-const DEFAULT_GROQ_KEY = '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';
-
-let selectedVoiceType = 'custom'; // 'builtin-0'..'builtin-3' | 'custom'
-let activePresetVoice = 1; // 0 = 1. hang, 1 = 2. hang (alapértelmezett)
 
 function switchSettingsTab(tab){
   document.getElementById('stab-voice').classList.toggle('active', tab==='voice');
@@ -1951,9 +2065,9 @@ async function pbOnRecordingStop(){
     // prompt: kontextus segíti a modellt a magyar kifejezésekhez
     formData.append('prompt','Ez egy magyar nyelvű kérdés vagy kérés. A felhasználó segítséget kér, véleményt mond, vagy kommunikál valakivel. Hétköznapi, természetes magyar mondat.');
 
-    const sttRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions',{
+    const sttRes = await groqFetch('https://api.groq.com/openai/v1/audio/transcriptions',{
       method:'POST',
-      headers:{'Authorization':'Bearer '+groqKey},
+      headers:{},
       body: formData
     });
     if(!sttRes.ok){
@@ -2088,9 +2202,9 @@ async function pbGenerate(){
   document.getElementById('pb-loading').querySelector('span').textContent='Válaszok generálása…';
 
   try{
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    const res=await groqFetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'llama-3.3-70b-versatile',
         max_tokens:500,
