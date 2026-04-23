@@ -529,117 +529,6 @@
     display: flex; align-items: center; justify-content: center; transition: all 0.15s;
   }
   .qedit-del:active { transform: scale(0.97); background: var(--danger); color: #fff; }
-  /* ─── PAGE 4 – PÁRBESZÉD ─── */
-  .pb-page { display: flex; flex-direction: column; flex: 1; overflow-y: auto; padding: 12px 14px 16px; gap: 12px; }
-  .pb-hint {
-    font-size: 13px; color: var(--text2); font-weight: 600; line-height: 1.5;
-    display: flex; align-items: flex-start; gap: 8px;
-    background: var(--accent-light); border-radius: var(--radius-sm); padding: 10px 14px; flex-shrink: 0;
-  }
-  .pb-mic-area { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
-  .pb-mic-btn {
-    display: flex; align-items: center; justify-content: center; gap: 12px;
-    width: 100%; padding: 18px; border: none; border-radius: var(--radius);
-    background: var(--accent); color: #fff;
-    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 18px;
-    cursor: pointer; transition: all 0.15s;
-    box-shadow: 0 4px 20px rgba(37,99,235,0.35);
-  }
-  .pb-mic-btn:active { transform: scale(0.97); }
-  .pb-mic-btn.recording {
-    background: var(--danger); box-shadow: 0 4px 20px rgba(220,38,38,0.4);
-    animation: pulse-red 1.2s infinite;
-  }
-  @keyframes pulse-red {
-    0%,100% { box-shadow: 0 4px 20px rgba(220,38,38,0.4); }
-    50% { box-shadow: 0 4px 40px rgba(220,38,38,0.8); }
-  }
-  .pb-wave-wrap {
-    background: #0f172a; border-radius: var(--radius-sm);
-    overflow: hidden; position: relative; height: 72px; flex-shrink: 0;
-  }
-  #pb-wave-canvas { display: block; width: 100%; height: 64px; }
-  .pb-wave-label {
-    position: absolute; bottom: 4px; left: 0; right: 0;
-    text-align: center; font-family: 'Nunito', sans-serif;
-    font-weight: 800; font-size: 11px; color: rgba(255,255,255,0.45);
-    letter-spacing: 1px; text-transform: uppercase;
-  }
-  .pb-transcript-box {
-    background: var(--surface); border: 2px solid var(--accent-light);
-    border-radius: var(--radius-sm); padding: 14px; box-shadow: var(--shadow); flex-shrink: 0;
-  }
-  .pb-transcript-label {
-    font-size: 11px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 1px; color: var(--accent); margin-bottom: 8px;
-  }
-  .pb-transcript-text {
-    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 16px;
-    color: var(--text); line-height: 1.5; margin-bottom: 12px;
-  }
-  .pb-transcript-actions { display: flex; gap: 10px; }
-  .pb-clear-btn {
-    display: flex; align-items: center; gap: 6px;
-    padding: 11px 16px; border: 2px solid var(--surface2); border-radius: 12px;
-    background: var(--surface2); color: var(--text2);
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
-    cursor: pointer; transition: all 0.15s; flex-shrink: 0;
-  }
-  .pb-clear-btn:active { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
-  .pb-gen-btn {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 12px 16px; border: none; border-radius: 12px;
-    background: var(--accent2); color: #fff;
-    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px;
-    cursor: pointer; transition: all 0.15s;
-    box-shadow: 0 4px 14px rgba(5,150,105,0.3);
-  }
-  .pb-gen-btn:active { transform: scale(0.97); }
-  .pb-gen-btn:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; pointer-events: none; }
-  .pb-loading {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 14px; padding: 30px 20px;
-    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; color: var(--text2);
-  }
-  .pb-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex-shrink: 0; }
-  .pb-col { display: flex; flex-direction: column; gap: 8px; }
-  .pb-col-header {
-    display: flex; align-items: center; gap: 6px;
-    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 11px;
-    text-transform: uppercase; letter-spacing: 1px; padding: 2px 0 4px;
-  }
-  .pb-col-yes .pb-col-header { color: var(--accent2); }
-  .pb-col-no .pb-col-header { color: var(--danger); }
-  .pb-item {
-    background: var(--surface); border: 2px solid var(--surface2);
-    border-radius: var(--radius-sm); padding: 8px;
-    display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow);
-  }
-  .pb-item-yes { border-color: #bbf7d0; }
-  .pb-item-no  { border-color: #fecaca; }
-  .pb-item-text {
-    width: 100%; background: var(--bg); border: 1.5px solid var(--surface2);
-    border-radius: 10px; color: var(--text);
-    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
-    padding: 9px 10px; outline: none; resize: none; line-height: 1.4;
-    transition: border-color 0.2s;
-  }
-  .pb-item-text:focus { border-color: var(--accent); }
-  .pb-item-speak {
-    width: 100%; padding: 9px; border: none; border-radius: 10px;
-    cursor: pointer; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 12px;
-  }
-  .pb-speak-yes { background: var(--accent2); color: #fff; }
-  .pb-speak-no  { background: var(--danger); color: #fff; }
-  .pb-item-speak:active { transform: scale(0.95); opacity: 0.85; }
-  @media (max-width: 380px) { .pb-answers { grid-template-columns: 1fr; } }
-  @media (min-width: 768px) {
-    .pb-item-text { font-size: 15px; }
-    .pb-col-header { font-size: 12px; }
-    .pb-mic-btn { font-size: 20px; }
-  }
   /* ─── SETTINGS TABS ─── */
   .stab-bar {
     display: flex; gap: 6px; margin-bottom: 18px;
@@ -874,81 +763,12 @@
         </div>
       </div>
 
-      <!-- PAGE 4 – PÁRBESZÉD -->
-      <div class="page" id="page-4">
-        <div class="pb-page">
-          <div class="pb-hint">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;color:#2563eb"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-            Nyomd a mikrofont, tedd le a telefont magad mellé — a kérdező hangját érzékeli. Leállítás után AI generálja a válaszokat.
-          </div>
-
-          <!-- MIC GOMB + HULLÁM -->
-          <div class="pb-mic-area">
-            <button class="pb-mic-btn" id="pb-mic-btn" onclick="pbToggleMic()">
-              <svg id="pb-mic-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-              <span id="pb-mic-label">Mikrofon indítása</span>
-            </button>
-            <!-- Hullám vizualizáció -->
-            <div class="pb-wave-wrap" id="pb-wave-wrap" style="display:none">
-              <canvas id="pb-wave-canvas" height="64"></canvas>
-              <div class="pb-wave-label" id="pb-wave-label">Hallgatom…</div>
-            </div>
-          </div>
-
-          <!-- Felismert szöveg -->
-          <div class="pb-transcript-box" id="pb-transcript-box" style="display:none">
-            <div class="pb-transcript-label">Felismert kérdés:</div>
-            <div class="pb-transcript-text" id="pb-transcript-text"></div>
-            <div class="pb-transcript-actions">
-              <button class="pb-clear-btn" onclick="pbReset()" title="Újra">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.89"/></svg>
-                Újra
-              </button>
-              <button class="pb-gen-btn" id="pb-gen-btn" onclick="pbGenerate()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                Válaszok generálása
-              </button>
-            </div>
-          </div>
-
-          <!-- Loading -->
-          <div class="pb-loading" id="pb-loading" style="display:none">
-            <svg class="spin" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-            <span>Átírás és generálás…</span>
-          </div>
-
-          <!-- VÁLASZOK -->
-          <div class="pb-answers" id="pb-answers" style="display:none">
-            <div class="pb-col pb-col-yes">
-              <div class="pb-col-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                IGEN – igenleges
-              </div>
-              <div class="pb-item pb-item-yes"><textarea class="pb-item-text" id="pb-yes-text-0" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-yes" onclick="pbSpeak('pb-yes-text-0')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
-              <div class="pb-item pb-item-yes"><textarea class="pb-item-text" id="pb-yes-text-1" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-yes" onclick="pbSpeak('pb-yes-text-1')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
-              <div class="pb-item pb-item-yes"><textarea class="pb-item-text" id="pb-yes-text-2" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-yes" onclick="pbSpeak('pb-yes-text-2')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
-            </div>
-            <div class="pb-col pb-col-no">
-              <div class="pb-col-header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                NEM – nemleges
-              </div>
-              <div class="pb-item pb-item-no"><textarea class="pb-item-text" id="pb-no-text-0" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-no" onclick="pbSpeak('pb-no-text-0')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
-              <div class="pb-item pb-item-no"><textarea class="pb-item-text" id="pb-no-text-1" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-no" onclick="pbSpeak('pb-no-text-1')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
-              <div class="pb-item pb-item-no"><textarea class="pb-item-text" id="pb-no-text-2" rows="2" placeholder="…"></textarea><button class="pb-item-speak pb-speak-no" onclick="pbSpeak('pb-no-text-2')"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- TABS -->
     <div class="tabs" id="tabs">
       <button class="tab active" onclick="switchTab(0,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>Gépelés</button>
       <button class="tab" onclick="switchTab(1,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Mentett</button>
       <button class="tab" onclick="switchTab(2,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L9.5 9.5 3 12l6.5 2.5L12 21l2.5-6.5L21 12l-6.5-2.5z"/></svg>Generálás</button>
       <button class="tab" onclick="switchTab(3,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Kézírás</button>
-      <button class="tab" onclick="switchTab(4,this)"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Párbeszéd</button>
     </div>
   </div>
 </div>
@@ -1100,54 +920,23 @@
 <div class="toast" id="toast"><svg id="toast-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-msg"></span></div>
 
 <script>
-let apiKey='', voiceId='', modelId='eleven_turbo_v2_5', groqKey='';
+let apiKey='', voiceId='', modelId='eleven_turbo_v2_5', groqKey='worker';
 
-const GROQ_KEYS = [
-  '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',
-  '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',
-  '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',
-  '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'
-];
-let activeGroqKeyIdx = 0;
-const DEFAULT_GROQ_KEY = GROQ_KEYS[0];
 
-// Groq API hívás automatikus kulcs-fallback-kal
+// Cloudflare Worker proxy URL (chat/completions hívásokhoz)
+const WORKER_URL = 'https://hangod.voiceprogram001.workers.dev';
+
+// Groq API hívás – minden hívás a Cloudflare Workeren át
 async function groqFetch(url, options){
-  let lastErr = null;
-  for(let t=0; t<GROQ_KEYS.length; t++){
-    const idx = (activeGroqKeyIdx + t) % GROQ_KEYS.length;
-    const key = GROQ_KEYS[idx];
-    const hdrs = Object.assign({}, options.headers||{}, {'Authorization':'Bearer '+key});
-    const opts = Object.assign({}, options, {headers: hdrs});
-    try{
-      const res = await fetch(url, opts);
-      if(!res.ok){
-        let isInvalid = false;
-        try{
-          const j = await res.json();
-          const msg = (j.error?.message||'').toLowerCase();
-          lastErr = new Error(j.error?.message||'Groq API hiba: '+res.status);
-          if(res.status===401||res.status===403||res.status===429||msg.includes('invalid')||msg.includes('quota')||msg.includes('rate')){
-            isInvalid = true;
-          }
-        }catch(_){ lastErr = new Error('Groq API hiba: '+res.status); isInvalid=true; }
-        if(isInvalid && t < GROQ_KEYS.length-1){
-          activeGroqKeyIdx = (activeGroqKeyIdx+t+1) % GROQ_KEYS.length;
-          groqKey = GROQ_KEYS[activeGroqKeyIdx];
-          continue;
-        }
-        throw lastErr;
-      }
-      if(t>0){ activeGroqKeyIdx=idx; groqKey=key; }
-      return res;
-    }catch(e){
-      // Hálózati hiba (nem API hiba) → azonnal dobja, nincs értelme más kulccsal próbálni
-      if(e instanceof TypeError && e.message.toLowerCase().includes('fetch')){ throw e; }
-      if(t===GROQ_KEYS.length-1) throw e;
-      lastErr=e;
-    }
+  const hdrs = Object.assign({}, options.headers||{});
+  delete hdrs['Authorization'];
+  const opts = Object.assign({}, options, {headers: hdrs});
+  const res = await fetch(WORKER_URL, opts);
+  if(!res.ok){
+    let j; try{ j=await res.json(); }catch(_){}
+    throw new Error((j&&j.error)||'Worker hiba: '+res.status);
   }
-  throw lastErr||new Error('Minden Groq kulcs érvénytelen');
+  return res;
 }
 
 /* ── SETTINGS ── */
@@ -1202,11 +991,11 @@ function init(){
   apiKey  = localStorage.getItem('el_api')   || pv.apiKey;
   voiceId = localStorage.getItem('el_voice') || pv.voiceId;
   modelId = localStorage.getItem('el_model') || 'eleven_turbo_v2_5'; if(modelId==='eleven_multilingual_v2'){modelId='eleven_turbo_v2_5';localStorage.setItem('el_model',modelId);}
-  groqKey = localStorage.getItem('groq_api') || DEFAULT_GROQ_KEY;
+  groqKey = 'worker';
   selectedVoiceType = localStorage.getItem('voice_type') || 'custom';
   // Ha nincs mentett egyéni beállítás, a preset értékeket használjuk alapból
   if(!localStorage.getItem('el_api')) { apiKey=pv.apiKey; voiceId=pv.voiceId; modelId=pv.modelId; }
-  if(!localStorage.getItem('groq_api')) { groqKey=DEFAULT_GROQ_KEY; }
+  
   savedPhrases = JSON.parse(localStorage.getItem('saved_phrases')||'[]');
   const stored=localStorage.getItem('quick_phrases');
   if(stored) quickPhrases=JSON.parse(stored);
@@ -1937,9 +1726,7 @@ function saveCustomVoice(){
 }
 
 function saveGroqKey(){
-  groqKey = document.getElementById('groq-key-input').value.trim();
-  if(!groqKey){ toast('Add meg a Groq API kulcsot!','error','ti-alert-circle'); return; }
-  localStorage.setItem('groq_api', groqKey);
+  groqKey = 'worker';
   toast('Groq API kulcs elmentve!','success','ti-check');
 }
 
@@ -2009,359 +1796,6 @@ function toast(msg,type='',icon='ti-check'){
 }
 
 /* ── PÁRBESZÉD – Groq Whisper STT + AI válaszok + hullám vizualizáció ── */
-let pbMediaRecorder=null, pbAudioChunks=[], pbRecording=false, pbTranscript='';
-let pbAudioCtx=null, pbAnalyser=null, pbMicStream=null, pbWaveRAF=null;
-
-function pbToggleMic(){
-  if(pbRecording){ pbStopMic(); return; }
-  pbStartMic();
-}
-
-async function pbStartMic(){
-  if(!groqKey){
-    toast('Add meg a Groq API kulcsot a beállításokban!','error','ti-settings');
-    openSettings(); return;
-  }
-
-  // Android Chrome: getUserMedia csak HTTPS-en vagy localhost-on működik
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    toast('A mikrofon nem elérhető. Nyisd meg HTTPS-en (pl. GitHub Pages, Netlify)!','error','ti-alert-circle');
-    return;
-  }
-
-  try{
-    // Android Chrome-on explicit constraints segítenek az engedélykérés megjelenítésében
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        sampleRate: 16000
-      }
-    });
-    pbMicStream = stream;
-
-    // Waveform vizualizáció
-    pbAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    pbAnalyser = pbAudioCtx.createAnalyser();
-    pbAnalyser.fftSize = 256;
-    const src = pbAudioCtx.createMediaStreamSource(stream);
-    src.connect(pbAnalyser);
-    pbDrawWave();
-
-    // Legjobb supported mimeType
-    const mimeTypes=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];
-    let mimeType = '';
-    for(const m of mimeTypes){ if(MediaRecorder.isTypeSupported(m)){ mimeType=m; break; } }
-
-    pbAudioChunks=[];
-    pbMediaRecorder = new MediaRecorder(stream, mimeType?{mimeType}:{});
-    pbMediaRecorder.ondataavailable = e=>{ if(e.data.size>0) pbAudioChunks.push(e.data); };
-    pbMediaRecorder.onstop = pbOnRecordingStop;
-    pbMediaRecorder.start(250); // 250ms chunks
-
-    pbRecording=true;
-    const btn=document.getElementById('pb-mic-btn');
-    btn.classList.add('recording');
-    document.getElementById('pb-mic-label').textContent='Leállítás (felvétel folyik…)';
-    document.getElementById('pb-wave-wrap').style.display='block';
-    document.getElementById('pb-wave-label').textContent='Hallgatom…';
-    document.getElementById('pb-transcript-box').style.display='none';
-    document.getElementById('pb-answers').style.display='none';
-    document.getElementById('pb-loading').style.display='none';
-
-  }catch(e){
-    if(e.name==='NotAllowedError'||e.name==='PermissionDeniedError'){
-      toast('Mikrofon engedély szükséges! Böngésző beállításokban engedélyezd.','error','ti-microphone-off');
-    } else if(e.name==='NotFoundError'){
-      toast('Nem található mikrofon az eszközön!','error','ti-microphone-off');
-    } else if(e.name==='NotSupportedError'||e.name==='SecurityError'){
-      toast('Mikrofon csak HTTPS-en működik! Nyisd meg biztonságos kapcsolaton.','error','ti-alert-circle');
-    } else {
-      toast('Hiba: '+e.message,'error','ti-alert-circle');
-    }
-  }
-}
-
-function pbStopMic(){
-  if(pbMediaRecorder&&pbMediaRecorder.state!=='inactive') pbMediaRecorder.stop();
-  if(pbMicStream) pbMicStream.getTracks().forEach(t=>t.stop());
-  if(pbWaveRAF){ cancelAnimationFrame(pbWaveRAF); pbWaveRAF=null; }
-  if(pbAudioCtx){ pbAudioCtx.close(); pbAudioCtx=null; }
-  pbRecording=false;
-  const btn=document.getElementById('pb-mic-btn');
-  btn.classList.remove('recording');
-  document.getElementById('pb-mic-label').textContent='Mikrofon indítása';
-  document.getElementById('pb-wave-label').textContent='Átírás folyamatban…';
-}
-
-async function pbOnRecordingStop(){
-  const mimeType = pbAudioChunks[0]?.type || 'audio/webm';
-  const rawBlob = new Blob(pbAudioChunks, {type: mimeType});
-  pbAudioChunks=[];
-
-  if(rawBlob.size < 1000){
-    document.getElementById('pb-wave-wrap').style.display='none';
-    toast('Túl rövid a felvétel, próbáld újra!','error','ti-alert-circle');
-    return;
-  }
-
-  document.getElementById('pb-wave-wrap').style.display='none';
-  document.getElementById('pb-loading').style.display='flex';
-  document.getElementById('pb-loading').querySelector('span').textContent='Hangfeldolgozás…';
-
-  try{
-    // 16kHz mono WAV konvertálás AudioContext segítségével
-    // A Whisper 16kHz mono-ra optimalizált — ez a legfontosabb pontosítás
-    let wavBlob;
-    try{
-      wavBlob = await pbConvertToWav(rawBlob);
-    }catch(convErr){
-      // Ha a konverzió nem sikerül, az eredeti blobbal folytatjuk
-      console.warn('WAV konverzió sikertelen, eredeti formátum küldése:', convErr);
-      wavBlob = rawBlob;
-    }
-
-    document.getElementById('pb-loading').querySelector('span').textContent='Hangfelismerés…';
-
-    const ext = wavBlob.type.includes('wav') ? 'wav'
-              : mimeType.includes('mp4')  ? 'mp4'
-              : mimeType.includes('ogg')  ? 'ogg' : 'webm';
-
-    const formData = new FormData();
-    formData.append('file', wavBlob, 'audio.'+ext);
-    // whisper-large-v3 pontosabb mint a turbo, különösen nem-angol nyelveknél
-    formData.append('model','whisper-large-v3');
-    formData.append('language','hu');
-    // verbose_json: no_speech_prob mezőből ellenőrizhetjük a bizonyosságot
-    formData.append('response_format','verbose_json');
-    // temperature=0: determinisztikus, nem "hallucinálja" a szavakat
-    formData.append('temperature','0');
-    // prompt: kontextus segíti a modellt a magyar kifejezésekhez
-    formData.append('prompt','Ez egy magyar nyelvű kérdés vagy kérés. A felhasználó segítséget kér, véleményt mond, vagy kommunikál valakivel. Hétköznapi, természetes magyar mondat.');
-
-    const sttRes = await groqFetch('https://api.groq.com/openai/v1/audio/transcriptions',{
-      method:'POST',
-      headers:{},
-      body: formData
-    });
-    if(!sttRes.ok){
-      const err=await sttRes.json().catch(()=>({}));
-      throw new Error(err.error?.message||'Whisper hiba: '+sttRes.status);
-    }
-    const sttData=await sttRes.json();
-
-    // no_speech_prob > 0.6 → valószínűleg nem volt hallható hang
-    const segments = sttData.segments || [];
-    const avgNoSpeech = segments.length
-      ? segments.reduce((s,seg)=>s+(seg.no_speech_prob||0),0)/segments.length
-      : 0;
-
-    pbTranscript=(sttData.text||'').trim();
-
-    if(!pbTranscript || avgNoSpeech > 0.65){
-      document.getElementById('pb-loading').style.display='none';
-      toast('Nem sikerült felismerni a hangot – beszélj hangosabban, vagy próbáld újra!','error','ti-microphone-off');
-      return;
-    }
-
-    // Alacsony bizonyosság figyelmeztetés (0.4–0.65 között)
-    const lowConf = avgNoSpeech > 0.4;
-    document.getElementById('pb-transcript-text').textContent = pbTranscript;
-    document.getElementById('pb-transcript-box').style.display = 'block';
-    document.getElementById('pb-loading').style.display = 'none';
-    toast(
-      lowConf ? 'Felismerve (ellenőrizd a szöveget!)' : 'Hang felismerve!',
-      'success','ti-check'
-    );
-
-  }catch(e){
-    document.getElementById('pb-loading').style.display='none';
-    toast(e.message||'Felismerési hiba','error','ti-alert-circle');
-  }
-}
-
-// WebM/OGG → 16kHz mono WAV konvertálás AudioContext-en keresztül
-// A Whisper model erre van optimalizálva → jobb pontosság
-async function pbConvertToWav(blob){
-  const arrayBuf = await blob.arrayBuffer();
-  const tmpCtx = new AudioContext();
-  const decoded = await tmpCtx.decodeAudioData(arrayBuf);
-  tmpCtx.close();
-
-  const TARGET_SR = 16000;
-  const channels = 1; // mono
-  const offlineCtx = new OfflineAudioContext(channels, Math.ceil(decoded.duration * TARGET_SR), TARGET_SR);
-  const src = offlineCtx.createBufferSource();
-  src.buffer = decoded;
-  src.connect(offlineCtx.destination);
-  src.start(0);
-  const rendered = await offlineCtx.startRendering();
-
-  // PCM Int16 WAV elkészítése
-  const pcmData = rendered.getChannelData(0);
-  const int16 = new Int16Array(pcmData.length);
-  for(let i=0;i<pcmData.length;i++){
-    const s = Math.max(-1,Math.min(1,pcmData[i]));
-    int16[i] = s < 0 ? s*0x8000 : s*0x7FFF;
-  }
-  const wavBuf = pbMakeWavBuffer(int16, TARGET_SR);
-  return new Blob([wavBuf], {type:'audio/wav'});
-}
-
-function pbMakeWavBuffer(int16Data, sampleRate){
-  const len = int16Data.length;
-  const buf = new ArrayBuffer(44 + len*2);
-  const view = new DataView(buf);
-  const writeStr=(o,s)=>{for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i));};
-  writeStr(0,'RIFF');
-  view.setUint32(4, 36+len*2, true);
-  writeStr(8,'WAVE');
-  writeStr(12,'fmt ');
-  view.setUint32(16,16,true);      // chunk size
-  view.setUint16(20,1,true);       // PCM
-  view.setUint16(22,1,true);       // mono
-  view.setUint32(24,sampleRate,true);
-  view.setUint32(28,sampleRate*2,true); // byte rate
-  view.setUint16(32,2,true);       // block align
-  view.setUint16(34,16,true);      // bits per sample
-  writeStr(36,'data');
-  view.setUint32(40,len*2,true);
-  const pcmView = new Int16Array(buf,44);
-  pcmView.set(int16Data);
-  return buf;
-}
-
-function pbDrawWave(){
-  const canvas=document.getElementById('pb-wave-canvas');
-  if(!canvas||!pbAnalyser){ return; }
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width=canvas.offsetWidth;
-  const H=canvas.height=64;
-  const bufLen=pbAnalyser.frequencyBinCount;
-  const dataArr=new Uint8Array(bufLen);
-
-  function draw(){
-    pbWaveRAF=requestAnimationFrame(draw);
-    pbAnalyser.getByteTimeDomainData(dataArr);
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#0f172a';
-    ctx.fillRect(0,0,W,H);
-    ctx.lineWidth=2.5;
-    ctx.strokeStyle='#ef4444';
-    ctx.shadowColor='#ef4444';
-    ctx.shadowBlur=8;
-    ctx.beginPath();
-    const sliceW=W/bufLen;
-    let x=0;
-    for(let i=0;i<bufLen;i++){
-      const v=dataArr[i]/128;
-      const y=(v*H)/2;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      x+=sliceW;
-    }
-    ctx.lineTo(W,H/2);
-    ctx.stroke();
-  }
-  draw();
-}
-
-async function pbGenerate(){
-  if(!pbTranscript){ toast('Először rögzíts egy kérdést!','error','ti-alert-circle'); return; }
-  if(!groqKey){ toast('Add meg a Groq API kulcsot!','error','ti-settings'); openSettings(); return; }
-
-  const btn=document.getElementById('pb-gen-btn');
-  btn.disabled=true;
-  document.getElementById('pb-answers').style.display='none';
-  document.getElementById('pb-loading').style.display='flex';
-  document.getElementById('pb-loading').querySelector('span').textContent='Válaszok generálása…';
-
-  try{
-    const res=await groqFetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        max_tokens:500,
-        temperature:0.7,
-        messages:[{
-          role:'system',
-          content:'Te egy AAC (Augmentative and Alternative Communication) segédprogram vagy. Néma vagy súlyosan beszédkorlátozott embereknek generálsz válaszokat. MINDIG CSAK a kért formátumban válaszolj, semmi más szöveg nélkül.'
-        },{
-          role:'user',
-          content:`A kommunikációs partner ezt mondta/kérdezte: "${pbTranscript}"
-
-Generálj pontosan 6 természetes MAGYAR mondatot – 3 igenleges (beleegyező, megerősítő, pozitív) és 3 nemleges (tagadó, elutasító, negatív) – amelyekkel a korlátozott személy válaszolhat.
-
-Szabályok:
-- Maximum 12 szó mondatonként
-- Változatos, árnyalt kifejezések (ne csak "igen/nem")
-- Természetes, hétköznapi magyar
-
-Válasz PONTOSAN ilyen formában (semmi más):
-IGEN:
-mondat1
-mondat2
-mondat3
-NEM:
-mondat4
-mondat5
-mondat6`
-        }]
-      })
-    });
-
-    if(!res.ok){
-      const err=await res.json().catch(()=>({}));
-      throw new Error(err.error?.message||'Groq API hiba: '+res.status);
-    }
-
-    const data=await res.json();
-    const raw=(data.choices?.[0]?.message?.content||'').trim();
-
-    const igenMatch=raw.match(/IGEN:\s*([\s\S]*?)(?=NEM:|$)/i);
-    const nemMatch=raw.match(/NEM:\s*([\s\S]*?)$/i);
-
-    const parseLines=(block)=>(block||'').split('\n')
-      .map(s=>s.replace(/^\d+[\.\)\-\s]*/,'').trim())
-      .filter(s=>s.length>2&&s.length<200)
-      .slice(0,3);
-
-    const igen=parseLines(igenMatch?.[1]||'');
-    const nem=parseLines(nemMatch?.[1]||'');
-
-    if(!igen.length&&!nem.length) throw new Error('Üres válasz – próbáld újra!');
-
-    for(let i=0;i<3;i++){
-      document.getElementById('pb-yes-text-'+i).value=igen[i]||'';
-      document.getElementById('pb-no-text-'+i).value=nem[i]||'';
-    }
-
-    document.getElementById('pb-loading').style.display='none';
-    document.getElementById('pb-answers').style.display='grid';
-    toast('Válaszok készen!','success','ti-check');
-
-  }catch(e){
-    document.getElementById('pb-loading').style.display='none';
-    toast(e.message||'Hiba történt','error','ti-alert-circle');
-  }
-  btn.disabled=false;
-}
-
-function pbSpeak(textareaId){
-  const text=document.getElementById(textareaId).value.trim();
-  if(!text){ toast('Nincs szöveg!','error','ti-alert-circle'); return; }
-  speakText(text);
-}
-
-function pbReset(){
-  pbTranscript='';
-  document.getElementById('pb-transcript-box').style.display='none';
-  document.getElementById('pb-answers').style.display='none';
-  document.getElementById('pb-loading').style.display='none';
-  document.getElementById('pb-wave-wrap').style.display='none';
-  document.getElementById('pb-mic-label').textContent='Mikrofon indítása';
-  document.getElementById('pb-mic-btn').classList.remove('recording');
-}
 
 init();
 </script>
@@ -2411,10 +1845,6 @@ init();
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         Írás
       </button>
-      <button class="stab" id="itab-dialog" onclick="switchInfoTab('dialog')" style="white-space:nowrap;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Párbeszéd
-      </button>
     </div>
 
     <div class="info-panel" id="ipanel-home">
@@ -2451,11 +1881,6 @@ init();
       <h3 class="info-h3">Kézírásos bevitel</h3>
       <p class="info-p">Ha a gépelés nehezedre esik, ujjal vagy ceruzával írhatsz a vászonra. A program AI segítségével felismeri a kézírást és szöveggé alakítja. A felismert szöveget felolvastathatod, a gépelő mezőbe küldheted, vagy elmentheted.</p>
     </div>
-
-    <div class="info-panel" id="ipanel-dialog" style="display:none">
-      <div class="info-feature-icon" style="background:var(--accent-light);">
-        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
       <h3 class="info-h3">Intelligens párbeszéd</h3>
       <p class="info-p">Indítsd el a mikrofont és tedd le a telefont magad mellé. A program érzékeli a kérdező hangját (orvos, hozzátartozó), felismeri a kérdést, majd az AI automatikusan generál <strong>3 igenleges és 3 nemleges választ</strong>. Kiválasztod a legmegfelelőbbet és egy gombnyomással felolvastatod – gépelés nélkül.</p>
     </div>
@@ -2476,7 +1901,7 @@ function closeInfo(){
   document.getElementById('info-modal').classList.remove('open');
 }
 function switchInfoTab(tab){
-  ['home','saved','gen','write','dialog'].forEach(function(t){
+  ['home','saved','gen','write'].forEach(function(t){
     document.getElementById('ipanel-'+t).style.display = t===tab ? 'block' : 'none';
     var btn = document.getElementById('itab-'+t);
     if(btn){ btn.classList.toggle('active', t===tab); }
