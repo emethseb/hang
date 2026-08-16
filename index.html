@@ -1437,7 +1437,7 @@ async function hwRecognize(){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'meta-llama/llama-4-scout-17b-16e-instruct',
+        model:'qwen/qwen3.6-27b',
         max_tokens:120,
         temperature:0.0,
         messages:[
@@ -1605,7 +1605,7 @@ async function generateSentences(){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
+        model:'openai/gpt-oss-120b',
         max_tokens:500,
         messages:[{
           role:'user',
