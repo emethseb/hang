@@ -1438,8 +1438,9 @@ async function hwRecognize(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'qwen/qwen3.6-27b',
-        max_tokens:120,
+        max_tokens:300,
         temperature:0.0,
+        reasoning_effort:'none',
         messages:[
           {
             role:'system',
